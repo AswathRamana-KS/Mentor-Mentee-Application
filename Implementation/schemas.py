@@ -74,6 +74,28 @@ class MentorApprovalResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
+class MentorShipRequest(BaseModel):
+    mentor_id: int
+    skill_id :int
+
+class MentorShipRequestResponse(BaseModel):
+    mr_id : int
+    mentor_id: int
+    mentee_id : int
+    skill_id :int   
+
+    model_config = {"from_attributes": True}
+
+class MentorShipAccept(BaseModel):
+    msa_id: int
+
+class MentorShipAcceptResponse(BaseModel):
+    ms_id : int
+    mentor_id: int
+    mentee_id : int
+    skill_id :int   
+
+    model_config = {"from_attributes": True}
 
 
 

@@ -63,13 +63,26 @@ def require_admin(current_user: models.Employee = Depends(get_current_user)):
         )
     return current_user
 
-def require_mentor(current_user: models.Employee = Depends(get_current_user)):
+def require_mentor_eligible(current_user: models.Employee = Depends(get_current_user)):
     if current_user.years_of_exp < 7:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="7+ years of experience required."
         )
     return current_user
+
+def require_mentor(
+    db: Session = Depends(get_db),
+    user : models.Employee = Depends(get_current_user)
+) -> models.Mentors:
+
+    m = db.query(models.Mentors).filter(models.Mentors.emp_id == user.emp_id).first()
+    if m is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Practice head doesn't exist."
+        )
+    return m
 
 def require_practiceHead(
     db: Session = Depends(get_db),

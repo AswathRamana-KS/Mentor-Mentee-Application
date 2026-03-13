@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 import models
 import schemas
-from auth import require_mentor, get_current_user, require_practiceHead
+from auth import require_mentor_eligible, get_current_user, require_practiceHead
 from datetime import datetime, timedelta
 
 router = APIRouter(prefix="/mentor", tags=["Mentor"])
@@ -13,7 +13,7 @@ router = APIRouter(prefix="/mentor", tags=["Mentor"])
 def apply_mentorship(
     mentor_data : schemas.MentorApplication,
     db: Session = Depends(get_db),
-    mentor: models.Employee = Depends(require_mentor)
+    mentor: models.Employee = Depends(require_mentor_eligible)
 ):
 
     existing = db.query(models.MentorApplication).filter(
@@ -72,7 +72,7 @@ def get_all_mapp(
            detail="Only admins and practice heads can perform this action"
         )
 
-@router.post("mapprov",response_model= schemas.MentorApprovalResponse, summary="Approve Mentor")
+@router.post("/mapprov",response_model= schemas.MentorApprovalResponse, summary="Approve Mentor")
 def mentor_approval(
     m_data : schemas.MentorApproval,   
     db : Session = Depends(get_db),

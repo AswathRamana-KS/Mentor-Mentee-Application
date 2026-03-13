@@ -57,3 +57,24 @@ class PracticeHead(Base):
 
     employee = relationship("Employee")
     skill = relationship("Skills")
+
+class MentorshipRequest(Base):
+    __tablename__ = "mentorship_request"
+
+    mr_id = Column(Integer, primary_key=True, index=True)
+
+    mentor_id = Column(Integer, ForeignKey("employees.emp_id"))
+    mentee_id = Column(Integer, ForeignKey("employees.emp_id"))    
+    skill_id = Column(Integer, ForeignKey("skills.skill_id"))    
+    status = Column(String(50))
+
+class Mentorship(Base):
+    __tablename__ = "mentorship"
+
+    ms_id = Column(Integer, primary_key=True, index=True)
+
+    mentor_id = Column(Integer, ForeignKey("employees.emp_id"))
+    mentee_id = Column(Integer, ForeignKey("employees.emp_id"))    
+    skill_id = Column(Integer, ForeignKey("skills.skill_id"))
+
+

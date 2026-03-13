@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from database import engine, Base
-from routers import auth, employees,skills, mentorapplication, practiceheadaddition
+from routers import auth, employees,skills, mentorapplication, practiceheadaddition, mentorship
 
 Base.metadata.create_all(bind=engine)
 
@@ -14,6 +14,8 @@ app.include_router(employees.router)
 app.include_router(skills.router)
 app.include_router(mentorapplication.router)
 app.include_router(practiceheadaddition.router)
+app.include_router(mentorship.router)
+
 
 @app.get("/")
 def root():
