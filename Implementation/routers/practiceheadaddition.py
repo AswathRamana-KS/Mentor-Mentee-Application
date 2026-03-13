@@ -5,11 +5,11 @@ import models
 import schemas
 from auth import require_admin
 
-router = APIRouter(prefix="/phadd", tags=["Practice Head"])
+router = APIRouter(prefix="/ph", tags=["Practice Head"])
 
 
-@router.post("/", response_model=schemas.practiceHeadAdditionResponse, status_code=status.HTTP_201_CREATED)
-def ph_addition(
+@router.post("/add", response_model=schemas.practiceHeadAdditionResponse, status_code=status.HTTP_201_CREATED)
+def practice_head_addition(
     prachead_data : schemas.practiceHeadAddition,
     db: Session = Depends(get_db),
     admin: models.Employee = Depends(require_admin)
