@@ -62,3 +62,11 @@ def require_admin(current_user: models.Employee = Depends(get_current_user)):
             detail="Only admins can perform this action"
         )
     return current_user
+
+def require_mentor(current_user: models.Employee = Depends(get_current_user)):
+    if current_user.years_of_exp < 7:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="7+ years of experience required."
+        )
+    return current_user

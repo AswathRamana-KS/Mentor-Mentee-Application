@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy import Column, Integer, String, Date, ForeignKey
 from database import Base
 
 
@@ -13,9 +13,33 @@ class Employee(Base):
     division = Column(String(100))
     date_of_joining = Column(Date)
     role_type = Column(String(50))
+    years_of_exp = Column(Integer)
 
 class Skills(Base):
     __tablename__ = "skills"
 
     skill_id = Column(Integer, primary_key=True, index=True)
     skill_name = Column(String(100), nullable=False)
+
+class MentorApplication(Base):
+    __tablename__ = "mentor_application"
+
+    ma_id = Column(Integer, primary_key=True, index=True)
+
+    # Foreign Key
+    emp_id = Column(Integer, ForeignKey("employees.emp_id"))
+
+    status = Column(String(50), nullable=False)    
+    submitted_at = Column(Date)
+    approved_by = Column(String(50))    
+    approved_at = Column(Date)
+
+class PracticeHead(Base):
+    __tablename__ = "practice_head"
+
+    ph_id = Column(Integer, primary_key=True, index=True)
+
+    # Foreign Key
+    emp_id = Column(Integer, ForeignKey("employees.emp_id"))
+
+    skill_id = Column(Integer, ForeignKey("skills.skill_id"))

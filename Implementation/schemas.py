@@ -2,6 +2,9 @@ from pydantic import BaseModel, EmailStr
 from datetime import date
 from typing import Optional
 
+
+
+# Employee -----------------------------------------------
 class EmployeeCreate(BaseModel):
     name: str
     email_id: EmailStr
@@ -10,8 +13,7 @@ class EmployeeCreate(BaseModel):
     division: Optional[str] = None
     date_of_joining: Optional[date] = None
     role_type: str
-
-
+    years_of_exp : int
 
 class EmployeeResponse(BaseModel):
     emp_id: int
@@ -21,6 +23,7 @@ class EmployeeResponse(BaseModel):
     division: Optional[str]
     date_of_joining: Optional[date]
     role_type: str
+    years_of_exp : int
 
     model_config = {"from_attributes": True}
 
@@ -33,12 +36,38 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
-
+# Skill -----------------------------------------------
 class SkillCreate(BaseModel):
     skill_name: str
 
 class SkillResponse(BaseModel):
     skill_id: int
     skill_name: str
+
+    model_config = {"from_attributes": True}
+
+
+# Mentor -----------------------------------------------
+
+class MentorApplicationResponse(BaseModel):
+    ma_id: int
+    emp_id : int
+    status : str = "Pending"  
+    submitted_at : Optional[date]    
+    approved_at : Optional[date] = None
+    approved_by : Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+# PracticeHead ----------------------------------------
+
+class practiceHeadAddition(BaseModel):
+    emp_id : int
+    skill_id : int
+
+class practiceHeadAdditionResponse(BaseModel):
+    ph_id : int
+    emp_id : int
+    skill_id : int
 
     model_config = {"from_attributes": True}

@@ -17,8 +17,11 @@ else:
         hashed_password=hash_password("admin123"),  
         phone_number="1234567890",
         division="Administration",
-        date_of_joining=date(2020, 1, 15),
-        role_type="Admin"
+        date_of_joining=date(2015, 1, 15),
+        role_type="Admin",
+        years_of_exp = 11
+
+    
     )
     db.add(admin)
     db.commit()
