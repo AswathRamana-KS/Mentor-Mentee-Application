@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Date, ForeignKey
+from sqlalchemy.orm import relationship
 from database import Base
 
 
@@ -29,17 +30,30 @@ class MentorApplication(Base):
     # Foreign Key
     emp_id = Column(Integer, ForeignKey("employees.emp_id"))
 
+    skill_id = Column(Integer, ForeignKey("skills.skill_id"))
+
     status = Column(String(50), nullable=False)    
     submitted_at = Column(Date)
     approved_by = Column(String(50))    
     approved_at = Column(Date)
+
+class Mentors(Base):
+    __tablename__ = "mentors"
+
+    m_id = Column(Integer, primary_key=True, index=True)
+
+    # Foreign Key
+    ma_id = Column(Integer, ForeignKey("mentor_application.ma_id"))    
+    emp_id = Column(Integer, ForeignKey("employees.emp_id"))
+    skill_id = Column(Integer, ForeignKey("skills.skill_id"))
 
 class PracticeHead(Base):
     __tablename__ = "practice_head"
 
     ph_id = Column(Integer, primary_key=True, index=True)
 
-    # Foreign Key
     emp_id = Column(Integer, ForeignKey("employees.emp_id"))
-
     skill_id = Column(Integer, ForeignKey("skills.skill_id"))
+
+    employee = relationship("Employee")
+    skill = relationship("Skills")

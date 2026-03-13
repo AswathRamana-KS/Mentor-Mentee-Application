@@ -70,3 +70,16 @@ def require_mentor(current_user: models.Employee = Depends(get_current_user)):
             detail="7+ years of experience required."
         )
     return current_user
+
+def require_practiceHead(
+    db: Session = Depends(get_db),
+    user : models.Employee = Depends(get_current_user)
+) -> models.PracticeHead:
+
+    ph = db.query(models.PracticeHead).filter(models.PracticeHead.emp_id == user.emp_id).first()
+    if ph is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Practice head doesn't exist."
+        )
+    return ph

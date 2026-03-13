@@ -8,7 +8,7 @@ from auth import require_admin
 router = APIRouter(prefix="/ph", tags=["Practice Head"])
 
 
-@router.post("/add", response_model=schemas.practiceHeadAdditionResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/add", response_model=schemas.practiceHeadResponse, status_code=status.HTTP_201_CREATED, summary = "Add Practice Heads")
 def practice_head_addition(
     prachead_data : schemas.practiceHeadAddition,
     db: Session = Depends(get_db),
@@ -55,3 +55,10 @@ def practice_head_addition(
     db.refresh(new_ph)
 
     return new_ph
+
+@router.get("/",response_model=list[schemas.practiceHeadResponse],summary= "Get All Practice Heads")
+def get_phs(
+    db:Session = Depends(get_db),
+    admin : models.Employee = Depends(require_admin)
+):
+    return db.query(models.PracticeHead).all()   

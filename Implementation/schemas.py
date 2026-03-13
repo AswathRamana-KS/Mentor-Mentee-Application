@@ -49,9 +49,13 @@ class SkillResponse(BaseModel):
 
 # Mentor -----------------------------------------------
 
+class MentorApplication(BaseModel):
+    skill_id : int
+
 class MentorApplicationResponse(BaseModel):
     ma_id: int
     emp_id : int
+    skill_id :int
     status : str = "Pending"  
     submitted_at : Optional[date]    
     approved_at : Optional[date] = None
@@ -59,15 +63,32 @@ class MentorApplicationResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
+class MentorApproval(BaseModel):
+    ma_id : int
+
+class MentorApprovalResponse(BaseModel):
+    m_id : int
+    ma_id: int
+    emp_id : int
+    skill_id :int    
+
+    model_config = {"from_attributes": True}
+
+
+
+
 # PracticeHead ----------------------------------------
 
 class practiceHeadAddition(BaseModel):
     emp_id : int
     skill_id : int
 
-class practiceHeadAdditionResponse(BaseModel):
+class practiceHeadResponse(BaseModel):
     ph_id : int
     emp_id : int
     skill_id : int
+
+    employee: EmployeeResponse 
+    skill: SkillResponse
 
     model_config = {"from_attributes": True}
