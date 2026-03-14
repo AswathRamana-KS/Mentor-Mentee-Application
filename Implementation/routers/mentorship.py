@@ -59,12 +59,12 @@ def get_all_mreq(
     )
 
 @router.post("/accept",response_model= schemas.MentorShipAcceptResponse, summary="Accept Mentee")
-def mentor_approval(
+def mentor_accept(
     msa_data : schemas.MentorShipAccept,
     db : Session = Depends(get_db),
-    m : models.Mentors = Depends(require_mentor)
+    mentor : models.Mentors = Depends(require_mentor)
 ):
-    request = db.query(models.MentorshipRequest).filter(models.MentorshipRequest.mr_id == msa_data.msa_id).first()
+    request = db.query(models.MentorshipRequest).filter(models.MentorshipRequest.mr_id == msa_data.mr_id).first()
 
     if not request:
         raise HTTPException(status_code=404, detail="Mentorship request not found")
@@ -94,7 +94,7 @@ def get_ment_by_skill(
 ):
     skill_ments = db.query(models.Mentors).filter(
         models.Mentors.skill_id == s_id
-    )
+    ).all()
     return [
     {
         "skill": m.skill,
@@ -103,7 +103,7 @@ def get_ment_by_skill(
 ]
 
 @router.get("/getmentee", response_model=list[schemas.MenteeResponse], summary="Get All Mentees")
-def get_all_mreq(
+def get_all_mentee(
     db: Session = Depends(get_db),
     current_user: models.Employee = Depends(get_current_user)
 ):

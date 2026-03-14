@@ -91,7 +91,7 @@ class MentorShipRequestResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 class MentorShipAccept(BaseModel):
-    msa_id: int
+    mr_id: int
 
 class MentorShipAcceptResponse(BaseModel):
     ms_id : int

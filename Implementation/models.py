@@ -20,29 +20,26 @@ class Skills(Base):
     __tablename__ = "skills"
 
     skill_id = Column(Integer, primary_key=True, index=True)
-    skill_name = Column(String(100), nullable=False)
+    skill_name = Column(String(100), nullable=False, unique=True)
 
 class MentorApplication(Base):
     __tablename__ = "mentor_application"
 
     ma_id = Column(Integer, primary_key=True, index=True)
-
-    # Foreign Key
     emp_id = Column(Integer, ForeignKey("employees.emp_id"))
-
     skill_id = Column(Integer, ForeignKey("skills.skill_id"))
-
     status = Column(String(50), nullable=False)    
     submitted_at = Column(Date)
-    approved_by = Column(String(50))    
+    approved_by = Column(String(100))    
     approved_at = Column(Date)
+    
+    employee = relationship("Employee")
+    skill = relationship("Skills")
 
 class Mentors(Base):
     __tablename__ = "mentors"
 
     m_id = Column(Integer, primary_key=True, index=True)
-
-    # Foreign Key
     ma_id = Column(Integer, ForeignKey("mentor_application.ma_id"))    
     emp_id = Column(Integer, ForeignKey("employees.emp_id"))
     skill_id = Column(Integer, ForeignKey("skills.skill_id"))
@@ -54,7 +51,6 @@ class PracticeHead(Base):
     __tablename__ = "practice_head"
 
     ph_id = Column(Integer, primary_key=True, index=True)
-
     emp_id = Column(Integer, ForeignKey("employees.emp_id"))
     skill_id = Column(Integer, ForeignKey("skills.skill_id"))
 
@@ -69,13 +65,12 @@ class MentorshipRequest(Base):
     mentor_id = Column(Integer, ForeignKey("employees.emp_id"))
     mentee_id = Column(Integer, ForeignKey("employees.emp_id"))    
     skill_id = Column(Integer, ForeignKey("skills.skill_id"))    
-    status = Column(String(50))
+    status = Column(String(50), nullable= False, default="Pending")
 
 class Mentorship(Base):
     __tablename__ = "mentorship"
 
     ms_id = Column(Integer, primary_key=True, index=True)
-
     mentor_id = Column(Integer, ForeignKey("employees.emp_id"))
     mentee_id = Column(Integer, ForeignKey("employees.emp_id"))    
     skill_id = Column(Integer, ForeignKey("skills.skill_id"))
@@ -84,11 +79,10 @@ class Goal(Base):
     __tablename__ = "goal"
 
     g_id = Column(Integer, primary_key=True, index=True)
-
     ms_id = Column(Integer, ForeignKey("mentorship.ms_id"))   
-    title = Column(String(50))
-    desc = Column(String(200))
+    title = Column(String(100))
+    desc = Column(String(1000))
     deadline = Column(Date)
-    percent = Column(Float)
+    percent = Column(Float, default=0.0)
 
 

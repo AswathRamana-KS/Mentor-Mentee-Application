@@ -82,7 +82,7 @@ def require_mentor(
             status_code=404,
             detail="Practice head doesn't exist."
         )
-    return m
+    return user
 
 def require_practiceHead(
     db: Session = Depends(get_db),

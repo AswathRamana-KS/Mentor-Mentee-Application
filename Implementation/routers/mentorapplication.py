@@ -43,12 +43,6 @@ def apply_mentorship(
 
     return new_mentor_app
 
-# @router.get("/",response_model=list[schemas.MentorApplicationResponse],summary="Get All Mentor Applications")
-# def get_all_mapp(
-#     db : Session = Depends(get_db),
-#     admin: models.Employee = Depends(get_current_user)
-# ):
-#     return db.query(models.MentorApplication).all()
 
 @router.get("/", response_model=list[schemas.MentorApplicationResponse], summary="Get All Mentor Applications")
 def get_all_mapp(
@@ -85,6 +79,12 @@ def mentor_approval(
     
     if application.status == "Approved":
         raise HTTPException(status_code=400, detail="Application is already approved")
+    
+    if application.skill_id != ph.skill_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only approve applications for your practice area skill."
+        )
     
     application.status = "Approved"
     application.approved_at = datetime.now().date()

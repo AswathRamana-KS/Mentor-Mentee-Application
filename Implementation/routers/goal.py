@@ -38,6 +38,17 @@ def get_mentee_goals(
     db: Session = Depends(get_db),
     user: models.Employee = Depends(require_mentor)
 ):
+    mentorship = db.query(models.Mentorship).filter(
+        models.Mentorship.ms_id == ms_id
+    ).first()
+    if not mentorship:
+        raise HTTPException(status_code=404, detail="Mentorship not found")
+
+    if user.emp_id not in (mentorship.mentor_id, mentorship.mentee_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not part of this mentorship."
+        )
     return db.query(models.Goal).filter(models.Goal.ms_id == ms_id).all()
 
 
@@ -56,6 +67,16 @@ def update_goal_percent(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, 
             detail="Goal not found or you are not the assigned mentor"
+        )
+    
+    mentorship = db.query(models.Mentorship).filter(
+        models.Mentorship.ms_id == goal.ms_id,
+        models.Mentorship.mentor_id == mentor.emp_id
+    ).first()
+    if not mentorship:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not the mentor for this goal."
         )
 
     goal.percent = update_data.percent
