@@ -3,8 +3,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 import models
 import schemas
-from auth import require_mentor, get_current_user, require_practiceHead
-from datetime import datetime, timedelta
+from auth import require_mentor, get_current_user
 
 router = APIRouter(prefix="/mentor", tags=["Mentor"])
 
@@ -86,3 +85,50 @@ def mentor_approval(
     db.refresh(new_mentorship)
 
     return new_mentorship
+
+@router.get("/skills/{s_id}",response_model=list[schemas.SkillReqResponse],summary= "Get mentors for skills")
+def get_ment_by_skill(
+    s_id : int,
+    user : models.Employee = Depends(get_current_user),
+    db : Session = Depends(get_db)
+):
+    skill_ments = db.query(models.Mentors).filter(
+        models.Mentors.skill_id == s_id
+    )
+    return [
+    {
+        "skill": m.skill,
+        "mentor": m.mentor
+    } for m in skill_ments
+]
+
+@router.get("/getmentee", response_model=list[schemas.MenteeResponse], summary="Get All Mentees")
+def get_all_mreq(
+    db: Session = Depends(get_db),
+    current_user: models.Employee = Depends(get_current_user)
+):
+    if current_user.role_type == "Admin":
+        return db.query(models.Mentorship).all()
+
+    ph_record = db.query(models.PracticeHead).filter(
+        models.PracticeHead.emp_id == current_user.emp_id
+    ).first()
+
+    if ph_record:
+        return db.query(models.Mentorship).filter(
+            models.Mentorship.skill_id == ph_record.skill_id
+        ).all()
+
+    mentor_record = db.query(models.Mentorship).filter(
+        models.Mentorship.mentor_id == current_user.emp_id
+    ).all()
+
+    if mentor_record:
+        return mentor_record
+
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="You do not have permission to view mentorship requests."
+    )
+
+

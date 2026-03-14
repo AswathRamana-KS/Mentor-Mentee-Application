@@ -46,6 +46,10 @@ class SkillResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
+class SkillReqResponse(BaseModel):
+    mentor : EmployeeResponse
+    skill : SkillResponse
+
 
 # Mentor -----------------------------------------------
 
@@ -97,6 +101,11 @@ class MentorShipAcceptResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
+class MenteeResponse(BaseModel):
+    ms_id : int
+    model_config = {"from_attributes": True}
+
+
 
 
 # PracticeHead ----------------------------------------
@@ -114,3 +123,25 @@ class practiceHeadResponse(BaseModel):
     skill: SkillResponse
 
     model_config = {"from_attributes": True}
+
+# Goal -----------------------------------------------
+
+class GoalCreate(BaseModel):
+    title : str
+    desc : str
+    deadline : date
+    percent : float
+
+class GoalResponse(BaseModel):
+
+    ms_id : int
+    title : str
+    desc : str
+    deadline : date
+    percent : float
+
+class GoalUpdatePercent(BaseModel):
+    percent: float
+
+
+

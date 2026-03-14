@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, Float
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -47,6 +47,9 @@ class Mentors(Base):
     emp_id = Column(Integer, ForeignKey("employees.emp_id"))
     skill_id = Column(Integer, ForeignKey("skills.skill_id"))
 
+    mentor = relationship("Employee")
+    skill = relationship("Skills")
+
 class PracticeHead(Base):
     __tablename__ = "practice_head"
 
@@ -76,5 +79,16 @@ class Mentorship(Base):
     mentor_id = Column(Integer, ForeignKey("employees.emp_id"))
     mentee_id = Column(Integer, ForeignKey("employees.emp_id"))    
     skill_id = Column(Integer, ForeignKey("skills.skill_id"))
+
+class Goal(Base):
+    __tablename__ = "goal"
+
+    g_id = Column(Integer, primary_key=True, index=True)
+
+    ms_id = Column(Integer, ForeignKey("mentorship.ms_id"))   
+    title = Column(String(50))
+    desc = Column(String(200))
+    deadline = Column(Date)
+    percent = Column(Float)
 
 

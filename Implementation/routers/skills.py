@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 import models
 import schemas
-from auth import require_admin
+from auth import require_admin, get_current_user
 
 router = APIRouter(prefix="/skills", tags=["Skills"])
 
@@ -35,3 +35,12 @@ def create_skills(
     db.refresh(new_skill)
 
     return new_skill
+
+@router.get("/",response_model=list[schemas.SkillResponse],summary= "Get All Available Skills")
+def get_all_skill(
+    user : models.Employee = Depends(get_current_user),
+    db : Session = Depends(get_db)
+):
+    skills = db.query(models.Skills).all()
+    return skills
+    
