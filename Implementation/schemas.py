@@ -60,10 +60,13 @@ class MentorApplicationResponse(BaseModel):
     ma_id: int
     emp_id : int
     skill_id :int
-    status : str = "Pending"  
+    status : str  
     submitted_at : Optional[date]    
-    approved_at : Optional[date] = None
-    approved_by : Optional[str] = None
+    approved_at : Optional[date] 
+    approved_by : Optional[str]
+
+    employee: Optional[EmployeeResponse] = None
+    skill: Optional[SkillResponse] = None
 
     model_config = {"from_attributes": True}
 

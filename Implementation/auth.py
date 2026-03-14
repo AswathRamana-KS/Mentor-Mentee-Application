@@ -12,29 +12,43 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+# If SECRET_KEY not present in .env, use fallback key
+SECRET_KEY = os.getenv("SECRET_KEY") or "supersecretkey123"
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
+
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
+
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+    return encoded_jwt
+
 
 def get_current_user(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
 ) -> models.Employee:
+
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -42,28 +56,49 @@ def get_current_user(
     )
 
     try:
+
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")  
+
+        email: str = payload.get("sub")
+
         if email is None:
             raise credentials_exception
+
     except JWTError:
         raise credentials_exception
 
-    employee = db.query(models.Employee).filter(models.Employee.email_id == email).first()
+    employee = db.query(models.Employee).filter(
+        models.Employee.email_id == email
+    ).first()
+
     if employee is None:
         raise credentials_exception
 
     return employee
 
+
 def require_admin(current_user: models.Employee = Depends(get_current_user)):
+
     if current_user.role_type != "Admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admins can perform this action"
         )
+
+    return current_user
+def require_mentor_eligible(current_user: models.Employee = Depends(get_current_user)):
+    
+    if current_user.years_of_exp < 7:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="7+ years of experience required to become mentor"
+        )
+
     return current_user
 
-def require_mentor_eligible(current_user: models.Employee = Depends(get_current_user)):
+
+def require_mentor(current_user: models.Employee = Depends(get_current_user)):
+
     if current_user.years_of_exp < 7:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
