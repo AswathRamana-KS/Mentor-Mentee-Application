@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { loginUser } from "../services/authService"
-
+import { getMyProfile } from "../services/employeeService"
 
 export default function Login() {
 
@@ -16,6 +16,7 @@ export default function Login() {
 
     try {
 
+      // login API
       const response = await loginUser(email, password)
 
       console.log("Token:", response.access_token)
@@ -23,10 +24,19 @@ export default function Login() {
       // store JWT token
       localStorage.setItem("token", response.access_token)
 
+      // get logged in user profile
+      const user = await getMyProfile()
+
+      console.log("User Profile:", user)
+
       alert("Login successful")
 
-      // redirect to dashboard
-      navigate("/mentee-dashboard")
+      // redirect based on role
+      if (user.role_type === "mentor") {
+        navigate("/mentor-dashboard")
+      } else {
+        navigate("/mentee-dashboard")
+      }
 
     } catch (error) {
 

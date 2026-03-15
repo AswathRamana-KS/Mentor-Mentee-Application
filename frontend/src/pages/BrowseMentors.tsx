@@ -1,6 +1,28 @@
-import MentorCard from "../components/MentorCard";
+import MentorCard from "../components/MentorCard"
 
 export default function BrowseMentors() {
+
+  const mentors = [
+    {
+      id: 1,
+      name: "Rahul Sharma",
+      skill: "Python",
+      experience: "5 years"
+    },
+    {
+      id: 2,
+      name: "Anita Verma",
+      skill: "React",
+      experience: "4 years"
+    },
+    {
+      id: 3,
+      name: "Amit Patel",
+      skill: "Machine Learning",
+      experience: "6 years"
+    }
+  ]
+
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
 
@@ -8,26 +30,20 @@ export default function BrowseMentors() {
 
       <div className="grid grid-cols-3 gap-6">
 
-        <MentorCard
-          name="Rahul Sharma"
-          skill="Python"
-          experience="5 years"
-        />
+        {mentors.map((mentor) => (
 
-        <MentorCard
-          name="Anita Verma"
-          skill="React"
-          experience="4 years"
-        />
+          <MentorCard
+            key={mentor.id}
+            id={mentor.id}
+            name={mentor.name}
+            skill={mentor.skill}
+            experience={mentor.experience}
+          />
 
-        <MentorCard
-          name="Amit Patel"
-          skill="Machine Learning"
-          experience="6 years"
-        />
+        ))}
 
       </div>
 
     </div>
-  );
+  )
 }
