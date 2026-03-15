@@ -2,18 +2,19 @@ import { requestMentor } from "../services/mentorService"
 
 interface Props {
   id: number
+  skillId: number
   name: string
   skill: string
   experience: string
 }
 
-export default function MentorCard({ id, name, skill, experience }: Props) {
+export default function MentorCard({ id, skillId, name, skill, experience }: Props) {
 
   const handleRequest = async () => {
 
     try {
 
-      await requestMentor(id)
+      await requestMentor(id, skillId)
 
       alert("Mentorship request sent!")
 
