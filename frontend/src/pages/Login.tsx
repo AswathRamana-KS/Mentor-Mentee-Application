@@ -1,3 +1,4 @@
+
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { loginUser } from "../services/authService"
@@ -16,33 +17,62 @@ export default function Login() {
 
     try {
 
-      // login API
+      // Login API
       const response = await loginUser(email, password)
 
       console.log("Token:", response.access_token)
 
-      // store JWT token
+      // Store JWT token
       localStorage.setItem("token", response.access_token)
 
-      // get logged in user profile
+      // Get logged in user profile
       const user = await getMyProfile()
 
       console.log("User Profile:", user)
 
+      // Normalize role (important)
+      const role = user.role_type?.toLowerCase()
+
+      // Store role for navbar
+      localStorage.setItem("role", role)
+
       alert("Login successful")
 
-      // redirect based on role
-      if (user.role_type === "mentor") {
+      // Redirect based on role
+      if (role === "admin") {
+
+        navigate("/admin-dashboard")
+
+      } 
+      else if (role === "team lead") {
+
+        navigate("/approve-mentors")
+
+      } 
+      else if (role === "mentor") {
+
         navigate("/mentor-dashboard")
-      } else {
+
+      } 
+      else if (role === "mentee") {
+
         navigate("/mentee-dashboard")
+
+      } 
+      else {
+
+        // fallback
+        navigate("/mentee-dashboard")
+
       }
 
     } catch (error) {
 
+      console.error(error)
       alert("Invalid email or password")
 
     }
+
   }
 
   return (
@@ -108,3 +138,4 @@ export default function Login() {
     </div>
   )
 }
+

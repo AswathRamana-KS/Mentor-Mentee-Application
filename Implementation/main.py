@@ -1,6 +1,8 @@
+
 from fastapi import FastAPI
 from database import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
+
 from routers import auth, employees, skills, mentorapplication, practiceheadaddition, mentorship, goal
 
 # Create database tables
@@ -18,10 +20,12 @@ origins = [
     "http://localhost:5174",
     "http://localhost:5175",
     "http://localhost:5176",
+    "http://localhost:5178",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5174",
     "http://127.0.0.1:5175",
-    "http://127.0.0.1:5176"
+    "http://127.0.0.1:5176",
+    "http://127.0.0.1:5178"
 ]
 
 app.add_middleware(
@@ -45,3 +49,4 @@ app.include_router(goal.router)
 @app.get("/")
 def root():
     return {"message": "MMA - Hola"}
+
