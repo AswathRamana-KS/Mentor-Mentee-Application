@@ -1,3 +1,4 @@
+
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -24,6 +25,8 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
+# ---------------- PASSWORD HELPERS ---------------- #
+
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
@@ -32,7 +35,10 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
+# ---------------- JWT TOKEN ---------------- #
+
 def create_access_token(data: dict) -> str:
+
     to_encode = data.copy()
 
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -43,6 +49,8 @@ def create_access_token(data: dict) -> str:
 
     return encoded_jwt
 
+
+# ---------------- CURRENT USER ---------------- #
 
 def get_current_user(
     token: str = Depends(oauth2_scheme),
@@ -77,6 +85,8 @@ def get_current_user(
     return employee
 
 
+# ---------------- ROLE CHECKS ---------------- #
+
 def require_admin(current_user: models.Employee = Depends(get_current_user)):
 
     if current_user.role_type != "Admin":
@@ -86,8 +96,10 @@ def require_admin(current_user: models.Employee = Depends(get_current_user)):
         )
 
     return current_user
+
+
 def require_mentor_eligible(current_user: models.Employee = Depends(get_current_user)):
-    
+
     if current_user.years_of_exp < 7:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -97,37 +109,42 @@ def require_mentor_eligible(current_user: models.Employee = Depends(get_current_
     return current_user
 
 
-def require_mentor(current_user: models.Employee = Depends(get_current_user)):
-
-    if current_user.years_of_exp < 7:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="7+ years of experience required."
-        )
-    return current_user
+# ---------------- MENTOR CHECK ---------------- #
 
 def require_mentor(
     db: Session = Depends(get_db),
-    user : models.Employee = Depends(get_current_user)
+    user: models.Employee = Depends(get_current_user)
 ) -> models.Mentors:
 
-    m = db.query(models.Mentors).filter(models.Mentors.emp_id == user.emp_id).first()
-    if m is None:
+    mentor = db.query(models.Mentors).filter(
+        models.Mentors.emp_id == user.emp_id
+    ).first()
+
+    if mentor is None:
         raise HTTPException(
-            status_code=404,
-            detail="Practice head doesn't exist."
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Mentor doesn't exist."
         )
+
     return user
+
+
+# ---------------- PRACTICE HEAD CHECK ---------------- #
 
 def require_practiceHead(
     db: Session = Depends(get_db),
-    user : models.Employee = Depends(get_current_user)
+    user: models.Employee = Depends(get_current_user)
 ) -> models.PracticeHead:
 
-    ph = db.query(models.PracticeHead).filter(models.PracticeHead.emp_id == user.emp_id).first()
+    ph = db.query(models.PracticeHead).filter(
+        models.PracticeHead.emp_id == user.emp_id
+    ).first()
+
     if ph is None:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Practice head doesn't exist."
         )
+
     return ph
+
