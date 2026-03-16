@@ -1,10 +1,10 @@
-import API from "./api";
+import API from "./api"
 
-export const createGoal = async (ms_id:number, data:any) => {
+export const createGoal = async (msId:number,data:any) => {
 
-  const response = await API.post(`/mentor/${ms_id}/goal`, data)
+const response = await API.post(`/mentor/${msId}/goal`,data)
 
-  return response.data
+return response.data
 
 }
 

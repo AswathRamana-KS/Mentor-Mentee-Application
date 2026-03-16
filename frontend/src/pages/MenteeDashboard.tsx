@@ -4,141 +4,144 @@ import { getMyProfile } from "../services/employeeService";
 
 export default function MenteeDashboard() {
 
-  const navigate = useNavigate();
+const navigate = useNavigate();
 
-  const [user, setUser] = useState<any>(null);
+const [user, setUser] = useState<any>(null);
 
-  useEffect(() => {
+useEffect(() => {
 
-    const loadProfile = async () => {
-      try {
 
-        const data = await getMyProfile();
+const loadProfile = async () => {
+  try {
 
-        setUser(data);
+    const data = await getMyProfile();
 
-      } catch (error) {
+    setUser(data);
 
-        console.error("Error loading profile");
+  } catch (error) {
 
-      }
-    };
+    console.error("Error loading profile");
 
-    loadProfile();
+  }
+};
 
-  }, []);
+loadProfile();
 
-  const handleLogout = () => {
 
-    localStorage.removeItem("token");
+}, []);
 
-    navigate("/");
+const handleLogout = () => {
 
-  };
 
-  return (
-    <div className="min-h-screen bg-gray-100 p-8">
+localStorage.removeItem("token");
 
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+navigate("/");
 
-        <h1 className="text-3xl font-bold">
-          Welcome {user?.name || "Mentee"}
-        </h1>
 
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-        >
-          Logout
-        </button>
+};
 
-      </div>
+return ( <div className="min-h-screen bg-gray-100 p-8">
 
-      {/* Dashboard Cards */}
-      <div className="grid grid-cols-3 gap-6">
+```
+  <div className="flex justify-between items-center mb-6">
 
-        {/* Browse Mentors */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
+    <h1 className="text-3xl font-bold">
+      Welcome {user?.name || "Mentee"}
+    </h1>
 
-          <h2 className="text-xl font-semibold mb-3">
-            Find a Mentor
-          </h2>
+    <button
+      onClick={handleLogout}
+      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+    >
+      Logout
+    </button>
 
-          <p className="text-gray-600 mb-4">
-            Browse available mentors based on their expertise.
-          </p>
+  </div>
 
-          <Link
-            to="/browse-mentors"
-            className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-          >
-            Browse Mentors
-          </Link>
+  <div className="grid grid-cols-3 gap-6">
 
-        </div>
+    <div className="bg-white p-6 rounded-lg shadow-md">
 
-        {/* My Mentorship */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-xl font-semibold mb-3">
+        Find a Mentor
+      </h2>
 
-          <h2 className="text-xl font-semibold mb-3">
-            My Mentorship
-          </h2>
+      <p className="text-gray-600 mb-4">
+        Browse available mentors based on their expertise.
+      </p>
 
-          <p className="text-gray-600 mb-4">
-            View your current mentorship and progress.
-          </p>
+      <Link
+        to="/browse-mentors"
+        className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+      >
+        Browse Mentors
+      </Link>
 
-          <Link
-            to="/goals"
-            className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-          >
-            View Goals
-          </Link>
+    </div>
 
-        </div>
+    <div className="bg-white p-6 rounded-lg shadow-md">
 
-        {/* Request Status */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
+      <h2 className="text-xl font-semibold mb-3">
+        My Mentorship
+      </h2>
 
-          <h2 className="text-xl font-semibold mb-3">
-            Request Status
-          </h2>
+      <p className="text-gray-600 mb-4">
+        View your current mentorship and progress.
+      </p>
 
-          <p className="text-gray-600 mb-4">
-            Track mentor requests you have sent.
-          </p>
+      <Link
+        to="/goals"
+        className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+      >
+        View Goals
+      </Link>
 
-          <button className="bg-gray-800 text-white px-4 py-2 rounded">
-            View Requests
-          </button>
+    </div>
 
-        </div>
+    <div className="bg-white p-6 rounded-lg shadow-md">
 
-      </div>
+      <h2 className="text-xl font-semibold mb-3">
+        Request Status
+      </h2>
 
-      {/* Example Mentorship Info */}
-      <div className="bg-white p-6 rounded-lg shadow-md mt-8">
+      <p className="text-gray-600 mb-4">
+        Track mentor requests you have sent.
+      </p>
 
-        <h2 className="text-xl font-semibold mb-4">
-          Current Mentor
-        </h2>
+      <Link
+        to="/mentor-requests"
+        className="bg-gray-800 text-white px-4 py-2 rounded"
+      >
+        View Requests
+      </Link>
 
-        <p><strong>Name:</strong> Rahul Sharma</p>
-        <p><strong>Skill:</strong> Python Development</p>
+    </div>
 
-        <div className="mt-4">
+  </div>
 
-          <p className="font-semibold mb-2">Progress</p>
+  <div className="bg-white p-6 rounded-lg shadow-md mt-8">
 
-          <div className="w-full bg-gray-300 rounded h-4">
-            <div className="bg-purple-600 h-4 rounded w-2/5"></div>
-          </div>
+    <h2 className="text-xl font-semibold mb-4">
+      Current Mentor
+    </h2>
 
-        </div>
+    <p><strong>Name:</strong> Rahul Sharma</p>
+    <p><strong>Skill:</strong> Python Development</p>
 
+    <div className="mt-4">
+
+      <p className="font-semibold mb-2">Progress</p>
+
+      <div className="w-full bg-gray-300 rounded h-4">
+        <div className="bg-purple-600 h-4 rounded w-2/5"></div>
       </div>
 
     </div>
-  );
+
+  </div>
+
+</div>
+
+
+);
 }

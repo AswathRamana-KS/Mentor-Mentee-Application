@@ -51,3 +51,10 @@ def get_my_profile(
     current_user: models.Employee = Depends(get_current_user)
 ):
     return current_user
+
+@router.get("/", summary="Get all employees")
+def get_all_employees(
+    db: Session = Depends(get_db),
+    admin: models.Employee = Depends(require_admin)
+):
+    return db.query(models.Employee).all()

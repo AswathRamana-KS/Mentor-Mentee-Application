@@ -1,98 +1,156 @@
 import { useEffect, useState } from "react"
-import { getMentorRequests, acceptMentorRequest } from "../services/mentorService"
+import API from "../services/api"
+import { Link } from "react-router-dom"
 
 export default function MentorDashboard() {
 
-  const [requests, setRequests] = useState<any[]>([])
+const [requests, setRequests] = useState<any[]>([])
 
-  useEffect(() => {
+useEffect(() => {
+loadRequests()
+}, [])
 
-    const loadRequests = async () => {
-
-      try {
-
-        const data = await getMentorRequests()
-
-        console.log("Mentor Requests:", data)
-
-        setRequests(data)
-
-      } catch (error) {
-
-        console.error("Failed to load requests")
-
-      }
-
-    }
-
-    loadRequests()
-
-  }, [])
+const loadRequests = async () => {
 
 
-  const handleAccept = async (mr_id: number) => {
+try {
 
-    try {
+  const res = await API.get("/mentor/getreqs")
+  setRequests(res.data)
 
-      await acceptMentorRequest(mr_id)
+} catch (error) {
 
-      alert("Request Accepted")
+  console.error("Failed to load mentee requests")
 
-      // remove accepted request from UI
-      setRequests((prev) => prev.filter((req) => req.mr_id !== mr_id))
+}
 
-    } catch (error) {
 
-      alert("Error accepting request")
+}
 
-    }
+const handleAccept = async (mr_id: number) => {
 
-  }
 
-  return (
-    <div className="p-8 bg-gray-100 min-h-screen">
+try {
 
-      <h1 className="text-3xl font-bold mb-6">Mentor Dashboard</h1>
+  await API.post("/mentor/accept", {
+    mr_id: mr_id
+  })
 
-      {requests.length === 0 && (
-        <p className="text-gray-600">No mentorship requests yet.</p>
-      )}
+  alert("Mentee Accepted")
 
-      {requests.map((req) => (
+  setRequests(prev => prev.filter(req => req.mr_id !== mr_id))
 
-        <div
-          key={req.mr_id}
-          className="bg-white p-6 rounded shadow mb-4"
+} catch (error) {
+
+  console.error("Accept failed")
+  alert("Error accepting request")
+
+}
+
+
+}
+
+const handleReject = async (mr_id: number) => {
+
+
+try {
+
+  await API.post("/mentor/reject", {
+    mr_id: mr_id
+  })
+
+  alert("Mentee Rejected")
+
+  setRequests(prev => prev.filter(req => req.mr_id !== mr_id))
+
+} catch (error) {
+
+  console.error("Reject failed")
+  alert("Error rejecting request")
+
+}
+
+
+}
+
+return (
+
+
+<div className="p-8 bg-gray-100 min-h-screen">
+
+  <h1 className="text-3xl font-bold mb-6">
+    Mentor Dashboard
+  </h1>
+
+  {/* Mentor Actions */}
+<div className="grid grid-cols-2 gap-6 mb-8">
+
+<Link
+to="/update-goal"
+className="bg-white p-6 rounded shadow hover:bg-gray-50"
+>
+<h2 className="text-xl font-semibold">
+Set Goals for Mentees
+</h2>
+</Link>
+
+<Link
+to="/goals"
+className="bg-white p-6 rounded shadow hover:bg-gray-50"
+>
+<h2 className="text-xl font-semibold">
+View Goal Progress
+</h2>
+</Link>
+
+</div>
+
+  {/* Mentorship Requests */}
+  <h2 className="text-2xl font-bold mb-4">
+    Mentorship Requests
+  </h2>
+
+  {requests.length === 0 && (
+    <p className="text-gray-600">
+      No mentorship requests yet.
+    </p>
+  )}
+
+  {requests.map((req) => (
+
+    <div
+      key={req.mr_id}
+      className="bg-white p-6 rounded shadow mb-4"
+    >
+
+      <p><strong>Mentee ID:</strong> {req.mentee_id}</p>
+      <p><strong>Skill ID:</strong> {req.skill_id}</p>
+
+      <div className="mt-3 space-x-2">
+
+        <button
+          onClick={() => handleAccept(req.mr_id)}
+          className="bg-green-600 text-white px-4 py-1 rounded"
         >
+          Accept
+        </button>
 
-          <h2 className="text-xl font-semibold mb-3">
-            Mentorship Request
-          </h2>
+        <button
+          onClick={() => handleReject(req.mr_id)}
+          className="bg-red-600 text-white px-4 py-1 rounded"
+        >
+          Reject
+        </button>
 
-          <p><strong>Mentee ID:</strong> {req.mentee_id}</p>
-          <p><strong>Skill ID:</strong> {req.skill_id}</p>
-
-          <div className="mt-3 space-x-2">
-
-            <button
-              onClick={() => handleAccept(req.mr_id)}
-              className="bg-green-600 text-white px-4 py-1 rounded"
-            >
-              Accept
-            </button>
-
-            <button
-              className="bg-red-600 text-white px-4 py-1 rounded"
-            >
-              Reject
-            </button>
-
-          </div>
-
-        </div>
-
-      ))}
+      </div>
 
     </div>
-  )
+
+  ))}
+
+</div>
+
+
+)
+
 }

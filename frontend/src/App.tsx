@@ -10,6 +10,11 @@ import MentorDashboard from "./pages/MentorDashboard";
 import BrowseMentors from "./pages/BrowseMentors";
 import Goals from "./pages/Goals";
 import AdminDashboard from "./pages/AdminDashboard"
+import ViewPracticeHeads from "./pages/ViewPracticeHeads"
+import ViewMentors from "./pages/ViewMentors"
+import ViewMentees from "./pages/ViewMentees"
+import ViewMentorsBySkill from "./pages/ViewMentorsBySkill"
+import MentorRequests from "./pages/MentorRequests"
 
 import AddEmployee from "./pages/AddEmployee";
 import AddPracticeHead from "./pages/AddPracticeHead";
@@ -44,6 +49,38 @@ function Layout() {
             </ProtectedRoute>
           }
         />
+        <Route
+ path="/mentors-by-skill"
+ element={
+   <ProtectedRoute>
+     <ViewMentorsBySkill/>
+   </ProtectedRoute>
+ }
+/>
+<Route
+path="/mentor-requests"
+element={
+<ProtectedRoute>
+<MentorRequests/>
+</ProtectedRoute>
+}
+/>
+        <Route
+ path="/view-practice-heads"
+ element={
+   <ProtectedRoute>
+     <ViewPracticeHeads/>
+   </ProtectedRoute>
+ }
+/>
+<Route
+ path="/view-mentees"
+ element={
+   <ProtectedRoute>
+     <ViewMentees/>
+   </ProtectedRoute>
+ }
+/>
 
         <Route
           path="/browse-mentors"
@@ -53,6 +90,14 @@ function Layout() {
             </ProtectedRoute>
           }
         />
+        <Route
+ path="/view-mentors"
+ element={
+   <ProtectedRoute>
+     <ViewMentors/>
+   </ProtectedRoute>
+ }
+/>
         <Route
  path="/admin-dashboard"
  element={

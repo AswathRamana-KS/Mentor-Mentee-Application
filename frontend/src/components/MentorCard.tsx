@@ -8,13 +8,13 @@ interface Props {
   experience: string
 }
 
-export default function MentorCard({ id, skillId, name, skill, experience }: Props) {
+export default function MentorCard({  skillId, name, skill, experience }: Props) {
 
   const handleRequest = async () => {
 
     try {
 
-      await requestMentor(id, skillId)
+      await requestMentor(skillId)
 
       alert("Mentorship request sent!")
 

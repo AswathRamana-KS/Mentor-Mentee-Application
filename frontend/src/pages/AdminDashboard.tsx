@@ -21,7 +21,15 @@ return(
 <Link to="/create-skill" className="bg-white p-6 shadow rounded">
 <h2 className="text-xl font-semibold">Create Skill</h2>
 </Link>
-
+<Link to="/view-practice-heads" className="bg-white p-6 shadow rounded">
+<h2 className="text-xl font-semibold">View Practice Heads</h2>
+</Link>
+<Link to="/view-mentors" className="bg-white p-6 shadow rounded">
+<h2 className="text-xl font-semibold">View Mentors</h2>
+</Link>
+<Link to="/view-mentees" className="bg-white p-6 shadow rounded">
+<h2 className="text-xl font-semibold">View Mentees</h2>
+</Link>
 </div>
 
 </div>

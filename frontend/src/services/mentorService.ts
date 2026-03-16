@@ -1,39 +1,37 @@
 import API from "./api"
 
-// send mentorship request
-export const requestMentor = async (mentorId: number, skillId: number) => {
+// employee applies to become mentor
+export const requestMentor = async (skillId: number) => {
 
-  const response = await API.post("/mentor/request", {
-    mentor_id: mentorId,
-    skill_id: skillId
-  })
+const response = await API.post("/mentor/mapp", {
+skill_id: skillId
+})
 
-  return response.data
+return response.data
 }
 
-// get mentors by skill
-export const getMentorsBySkill = async (skillId:number) => {
-
-  const response = await API.get(`/mentor/skills/${skillId}`)
-
-  return response.data
-
-}
-
-// get mentor requests
+// get mentor applications (for admin or practice head)
 export const getMentorRequests = async () => {
 
-  const response = await API.get("/mentor/getreqs")
+const response = await API.get("/mentor")
 
-  return response.data
+return response.data
 }
 
-// accept mentee request
-export const acceptMentorRequest = async (requestId: number) => {
+// approve mentor application
+export const acceptMentorRequest = async (applicationId: number) => {
 
-  const response = await API.post("/mentor/accept", {
-    mr_id: requestId
-  })
+const response = await API.post("/mentor/mapprov", {
+ma_id: applicationId
+})
 
-  return response.data
+return response.data
+}
+
+// get mentors by skill (used in BrowseMentors page)
+export const getMentorsBySkill = async (skillId: number) => {
+
+const response = await API.get(`/mentor/skills/${skillId}`)
+
+return response.data
 }
