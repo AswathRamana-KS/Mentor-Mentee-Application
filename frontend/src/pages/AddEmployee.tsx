@@ -1,3 +1,4 @@
+
 import { useState } from "react"
 import { registerEmployee } from "../services/employeeService"
 
@@ -6,6 +7,8 @@ export default function AddEmployee(){
 const [name,setName]=useState("")
 const [email,setEmail]=useState("")
 const [password,setPassword]=useState("")
+const [role,setRole]=useState("mentee")
+const [exp,setExp]=useState("")
 
 const handleSubmit = async (e:any)=>{
 e.preventDefault()
@@ -14,8 +17,10 @@ try{
 
 await registerEmployee({
 name,
-email,
-password
+email_id:email,
+password,
+role_type:role,
+years_of_exp:Number(exp)
 })
 
 alert("Employee Added Successfully")
@@ -51,10 +56,28 @@ className="border p-2"
 />
 
 <input
-placeholder="Password"
 type="password"
+placeholder="Password"
 value={password}
 onChange={(e)=>setPassword(e.target.value)}
+className="border p-2"
+/>
+
+<select
+value={role}
+onChange={(e)=>setRole(e.target.value)}
+className="border p-2"
+>
+<option value="mentee">Mentee</option>
+<option value="mentor">Mentor</option>
+<option value="team lead">Team Lead</option>
+</select>
+
+<input
+type="number"
+placeholder="Years of Experience"
+value={exp}
+onChange={(e)=>setExp(e.target.value)}
 className="border p-2"
 />
 
@@ -69,3 +92,4 @@ Add Employee
 )
 
 }
+

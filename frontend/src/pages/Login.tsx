@@ -31,40 +31,32 @@ export default function Login() {
       console.log("User Profile:", user)
 
       // Normalize role (important)
-      const role = user.role_type?.toLowerCase()
+  
+const role = user.role_type?.toLowerCase()
 
-      // Store role for navbar
-      localStorage.setItem("role", role)
+localStorage.setItem("role", role)
 
-      alert("Login successful")
+if (role === "admin") {
+  navigate("/add-employee")
+}
 
-      // Redirect based on role
-      if (role === "admin") {
+else if (role === "team lead") {
+  navigate("/approve-mentors")
+}
 
-        navigate("/admin-dashboard")
+else if (role === "mentor") {
+  navigate("/mentor-dashboard")
+}
 
-      } 
-      else if (role === "team lead") {
+else if (role === "mentee") {
+  navigate("/mentee-dashboard")
+}
 
-        navigate("/approve-mentors")
+else {
+  navigate("/mentee-dashboard")
+}
 
-      } 
-      else if (role === "mentor") {
 
-        navigate("/mentor-dashboard")
-
-      } 
-      else if (role === "mentee") {
-
-        navigate("/mentee-dashboard")
-
-      } 
-      else {
-
-        // fallback
-        navigate("/mentee-dashboard")
-
-      }
 
     } catch (error) {
 
