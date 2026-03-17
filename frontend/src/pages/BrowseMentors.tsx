@@ -9,7 +9,7 @@ export default function BrowseMentors() {
   const [mentors, setMentors] = useState<any[]>([])
   const [selectedSkill, setSelectedSkill] = useState<number | null>(null)
 
-  // load skills
+  
   useEffect(() => {
 
     const loadSkills = async () => {
@@ -31,7 +31,7 @@ export default function BrowseMentors() {
 
   }, [])
 
-  // when skill selected
+  
   const handleSkillChange = async (skillId:any) => {
 
     setSelectedSkill(Number(skillId))
@@ -57,7 +57,7 @@ export default function BrowseMentors() {
 
       <h1 className="text-3xl font-bold mb-6">Find Mentors by Skill</h1>
 
-      {/* Skill Dropdown */}
+      
 
       <div className="mb-6">
 
@@ -79,7 +79,7 @@ export default function BrowseMentors() {
 
       </div>
 
-      {/* Mentors */}
+      
 
       <div className="grid grid-cols-3 gap-6">
 

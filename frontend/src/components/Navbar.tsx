@@ -15,7 +15,7 @@ MentorMentee
 
 <div className="space-x-4">
 
-{/* MENTEE NAVBAR */}
+
 {role === "mentee" && (
 <>
 <Link to="/mentee-dashboard">Dashboard</Link>
@@ -24,21 +24,21 @@ MentorMentee
 </>
 )}
 
-{/* MENTOR NAVBAR */}
+
 {role === "mentor" && (
 <>
 <Link to="/mentor-dashboard">Dashboard</Link>
 </>
 )}
 
-{/* PRACTICE HEAD NAVBAR */}
+
 {role === "team lead" && (
 <>
 <Link to="/approve-mentors">Approve Mentors</Link>
 </>
 )}
 
-{/* ADMIN NAVBAR */}
+
 {role === "admin" && (
 <>
 <Link to="/add-employee">Add Employee</Link>
