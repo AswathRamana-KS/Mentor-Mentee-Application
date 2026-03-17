@@ -1,78 +1,49 @@
 import { useEffect, useState } from "react"
-import API from "../services/api"
+import { getAllMentors } from "../services/employeeService"
 
-export default function ViewMentors(){
-
-const [mentors,setMentors] = useState<any[]>([])
-
-useEffect(()=>{
-
-fetchMentors()
-
-},[])
-
-const fetchMentors = async () => {
-
-try{
-
-const res = await API.get("/employees")
-
-const mentorList = res.data.filter(
-(emp:any)=> emp.role_type?.toLowerCase() === "mentor"
-)
-
-setMentors(mentorList)
-
-}catch(error){
-
-console.error("Error fetching mentors")
-
+function initials(name: string) {
+  return name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "?"
 }
 
-}
+export default function ViewMentors() {
+  const [mentors, setMentors] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-return(
+  useEffect(() => {
+    getAllMentors().then(setMentors).catch(console.error).finally(() => setLoading(false))
+  }, [])
 
-<div className="p-8">
-
-<h1 className="text-3xl font-bold mb-6">Mentors</h1>
-
-<table className="w-full border">
-
-<thead>
-
-<tr className="bg-gray-200">
-
-<th className="p-2 border">Employee ID</th>
-<th className="p-2 border">Name</th>
-<th className="p-2 border">Email</th>
-<th className="p-2 border">Role</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{mentors.map((m,index)=>(
-
-<tr key={index}>
-
-<td className="border p-2">{m.emp_id}</td>
-<td className="border p-2">{m.name}</td>
-<td className="border p-2">{m.email_id}</td>
-<td className="border p-2">{m.role_type}</td>
-
-</tr>
-
-))}
-
-</tbody>
-
-</table>
-
-</div>
-
-)
-
+  return (
+    <div className="page">
+      <div className="page-header">
+        <h1 className="page-title">All Mentors</h1>
+        <p className="page-sub">{mentors.length} approved mentor(s)</p>
+      </div>
+      <div className="table-card">
+        {loading ? <div className="loading">Loading...</div> :
+         mentors.length === 0 ? <div className="empty">No approved mentors yet.</div> : (
+          <table>
+            <thead><tr><th>Name</th><th>Division</th><th>Experience</th></tr></thead>
+            <tbody>
+              {mentors.map(m => (
+                <tr key={m.emp_id}>
+                  <td>
+                    <div className="name-cell">
+                      <div className="avatar">{initials(m.name)}</div>
+                      <div>
+                        <div style={{ fontWeight: 500 }}>{m.name}</div>
+                        <div style={{ fontSize: "12px", color: "var(--text3)" }}>{m.email_id}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span className="badge badge-blue">{m.division || "—"}</span></td>
+                  <td>{m.years_of_exp} yrs</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
 }

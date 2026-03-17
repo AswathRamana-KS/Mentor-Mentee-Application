@@ -1,156 +1,109 @@
 import { useEffect, useState } from "react"
-import API from "../services/api"
+import { getMentorshipRequests, acceptMenteeRequest, rejectMenteeRequest, getMyMentees } from "../services/mentorService"
+import { getMyProfile } from "../services/employeeService"
 import { Link } from "react-router-dom"
 
 export default function MentorDashboard() {
+  const [requests, setRequests] = useState<any[]>([])
+  const [mentees, setMentees] = useState<any[]>([])
+  const [user, setUser] = useState<any>(null)
 
-const [requests, setRequests] = useState<any[]>([])
+  useEffect(() => { loadAll() }, [])
 
-useEffect(() => {
-loadRequests()
-}, [])
+  const loadAll = async () => {
+    try {
+      const [reqs, profile] = await Promise.all([getMentorshipRequests(), getMyProfile()])
+      setRequests(reqs.filter((r: any) => r.status === "Pending"))
+      setUser(profile)
+    } catch (e) { console.error(e) }
+    try { setMentees(await getMyMentees()) } catch { setMentees([]) }
+  }
 
-const loadRequests = async () => {
+  const accept = async (mr_id: number) => {
+    try { await acceptMenteeRequest(mr_id); alert("Accepted!"); loadAll() }
+    catch (e: any) { alert(e?.response?.data?.detail || "Error") }
+  }
 
+  const reject = async (mr_id: number) => {
+    try { await rejectMenteeRequest(mr_id); alert("Rejected"); loadAll() }
+    catch (e: any) { alert(e?.response?.data?.detail || "Error") }
+  }
 
-try {
-
-  const res = await API.get("/mentor/getreqs")
-  setRequests(res.data)
-
-} catch (error) {
-
-  console.error("Failed to load mentee requests")
-
-}
-
-
-}
-
-const handleAccept = async (mr_id: number) => {
-
-
-try {
-
-  await API.post("/mentor/accept", {
-    mr_id: mr_id
-  })
-
-  alert("Mentee Accepted")
-
-  setRequests(prev => prev.filter(req => req.mr_id !== mr_id))
-
-} catch (error) {
-
-  console.error("Accept failed")
-  alert("Error accepting request")
-
-}
-
-
-}
-
-const handleReject = async (mr_id: number) => {
-
-
-try {
-
-  await API.post("/mentor/reject", {
-    mr_id: mr_id
-  })
-
-  alert("Mentee Rejected")
-
-  setRequests(prev => prev.filter(req => req.mr_id !== mr_id))
-
-} catch (error) {
-
-  console.error("Reject failed")
-  alert("Error rejecting request")
-
-}
-
-
-}
-
-return (
-
-
-<div className="p-8 bg-gray-100 min-h-screen">
-
-  <h1 className="text-3xl font-bold mb-6">
-    Mentor Dashboard
-  </h1>
-
-  {/* Mentor Actions */}
-<div className="grid grid-cols-2 gap-6 mb-8">
-
-<Link
-to="/update-goal"
-className="bg-white p-6 rounded shadow hover:bg-gray-50"
->
-<h2 className="text-xl font-semibold">
-Set Goals for Mentees
-</h2>
-</Link>
-
-<Link
-to="/goals"
-className="bg-white p-6 rounded shadow hover:bg-gray-50"
->
-<h2 className="text-xl font-semibold">
-View Goal Progress
-</h2>
-</Link>
-
-</div>
-
-  {/* Mentorship Requests */}
-  <h2 className="text-2xl font-bold mb-4">
-    Mentorship Requests
-  </h2>
-
-  {requests.length === 0 && (
-    <p className="text-gray-600">
-      No mentorship requests yet.
-    </p>
-  )}
-
-  {requests.map((req) => (
-
-    <div
-      key={req.mr_id}
-      className="bg-white p-6 rounded shadow mb-4"
-    >
-
-      <p><strong>Mentee ID:</strong> {req.mentee_id}</p>
-      <p><strong>Skill ID:</strong> {req.skill_id}</p>
-
-      <div className="mt-3 space-x-2">
-
-        <button
-          onClick={() => handleAccept(req.mr_id)}
-          className="bg-green-600 text-white px-4 py-1 rounded"
-        >
-          Accept
-        </button>
-
-        <button
-          onClick={() => handleReject(req.mr_id)}
-          className="bg-red-600 text-white px-4 py-1 rounded"
-        >
-          Reject
-        </button>
-
+  return (
+    <div className="page">
+      <div className="page-header">
+        <h1 className="page-title">Welcome, {user?.name || "Mentor"}</h1>
+        <p className="page-sub">{mentees.length} active mentee(s)</p>
       </div>
 
+      {/* Quick actions */}
+      <div className="dashboard-grid" style={{ marginBottom: "28px" }}>
+        <Link to="/update-goal" className="dashboard-card">
+          <div className="card-icon">🎯</div>
+          <div className="card-title">Set Goals</div>
+          <div className="card-desc">Create and assign goals to your mentees</div>
+          <div className="card-arrow">Go →</div>
+        </Link>
+        <div className="card" style={{ cursor: "default" }}>
+          <div className="stat-label">Active Mentees</div>
+          <div className="stat-value">{mentees.length}</div>
+        </div>
+        <div className="card" style={{ cursor: "default" }}>
+          <div className="stat-label">Pending Requests</div>
+          <div className="stat-value">{requests.length}</div>
+        </div>
+      </div>
+
+      {/* Pending requests */}
+      <h2 className="section-title">Pending Requests</h2>
+      <div className="table-card" style={{ marginBottom: "28px" }}>
+        {requests.length === 0 ? <div className="empty">No pending requests.</div> : (
+          <table>
+            <thead><tr><th>Mentee ID</th><th>Skill ID</th><th>Actions</th></tr></thead>
+            <tbody>
+              {requests.map(r => (
+                <tr key={r.mr_id}>
+                  <td style={{ fontWeight: 500 }}>#{r.mentee_id}</td>
+                  <td><span className="badge badge-green">Skill #{r.skill_id}</span></td>
+                  <td>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button onClick={() => accept(r.mr_id)} className="btn btn-success btn-sm">Accept</button>
+                      <button onClick={() => reject(r.mr_id)} className="btn btn-danger btn-sm">Reject</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Active mentees */}
+      {mentees.length > 0 && (
+        <>
+          <h2 className="section-title">My Mentees</h2>
+          <div className="table-card">
+            <table>
+              <thead><tr><th>Mentorship ID</th><th>Mentee ID</th><th>Skill</th><th>Goals</th></tr></thead>
+              <tbody>
+                {mentees.map(m => (
+                  <tr key={m.ms_id}>
+                    <td style={{ color: "var(--text3)" }}>#{m.ms_id}</td>
+                    <td style={{ fontWeight: 500 }}>#{m.mentee_id}</td>
+                    <td><span className="badge badge-green">Skill #{m.skill_id}</span></td>
+                    <td>
+                      <Link to={`/update-goal?ms_id=${m.ms_id}`}
+                        style={{ color: "var(--teal-400)", fontSize: "13px", textDecoration: "none" }}>
+                        Set Goals →
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
-
-  ))}
-
-</div>
-
-
-)
-
+  )
 }

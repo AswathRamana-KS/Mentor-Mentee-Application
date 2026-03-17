@@ -1,88 +1,71 @@
 import { useEffect, useState } from "react"
-import API from "../services/api"
+import { getSkills } from "../services/skillService"
+import { getMentorsBySkill } from "../services/mentorService"
 
-export default function ViewMentorsBySkill(){
-
-const [skillId,setSkillId] = useState("")
-const [mentors,setMentors] = useState<any[]>([])
-
-const fetchMentors = async () => {
-
-try{
-
-const res = await API.get(`/mentor/skills/${skillId}`)
-
-setMentors(res.data)
-
-}catch(error){
-
-console.error("Error fetching mentors")
-
+function initials(name: string) {
+  return name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "?"
 }
 
-}
+export default function ViewMentorsBySkill() {
+  const [skills, setSkills] = useState<any[]>([])
+  const [selected, setSelected] = useState("")
+  const [mentors, setMentors] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
 
-return(
+  useEffect(() => { getSkills().then(setSkills).catch(console.error) }, [])
 
-<div className="p-8">
+  const handleChange = async (id: string) => {
+    setSelected(id)
+    if (!id) { setMentors([]); return }
+    setLoading(true)
+    try { setMentors(await getMentorsBySkill(Number(id))) }
+    catch (e) { console.error(e) }
+    finally { setLoading(false) }
+  }
 
-<h1 className="text-3xl font-bold mb-6">
-Mentors By Skill
-</h1>
+  return (
+    <div className="page">
+      <div className="page-header">
+        <h1 className="page-title">Mentors by Skill</h1>
+        <p className="page-sub">View approved mentors for each skill</p>
+      </div>
 
-<div className="mb-4 flex gap-4">
+      <div style={{ marginBottom: "24px", maxWidth: "320px" }}>
+        <div className="form-group" style={{ marginBottom: 0 }}>
+          <label>Select Skill</label>
+          <select value={selected} onChange={e => handleChange(e.target.value)}>
+            <option value="">— Select Skill —</option>
+            {skills.map(s => <option key={s.skill_id} value={s.skill_id}>{s.skill_name}</option>)}
+          </select>
+        </div>
+      </div>
 
-<input
-type="number"
-placeholder="Enter Skill ID"
-value={skillId}
-onChange={(e)=>setSkillId(e.target.value)}
-className="border p-2"
-/>
-
-<button
-onClick={fetchMentors}
-className="bg-purple-600 text-white px-4 py-2 rounded"
-
->
-
-Search </button>
-
-</div>
-
-<table className="w-full border">
-
-<thead>
-
-<tr className="bg-gray-200">
-
-<th className="border p-2">Employee ID</th>
-<th className="border p-2">Name</th>
-<th className="border p-2">Email</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{mentors.map((m,index)=>(
-
-<tr key={index}>
-
-<td className="border p-2">{m.emp_id}</td>
-<td className="border p-2">{m.name}</td>
-<td className="border p-2">{m.email_id}</td>
-
-</tr>
-))}
-
-</tbody>
-
-</table>
-
-</div>
-
-)
-
+      <div className="table-card">
+        {loading ? <div className="loading">Loading...</div> :
+         !selected ? <div className="empty">Select a skill to view mentors.</div> :
+         mentors.length === 0 ? <div className="empty">No mentors for this skill yet.</div> : (
+          <table>
+            <thead><tr><th>Name</th><th>Division</th><th>Experience</th></tr></thead>
+            <tbody>
+              {mentors.map(m => (
+                <tr key={m.mentor.emp_id}>
+                  <td>
+                    <div className="name-cell">
+                      <div className="avatar">{initials(m.mentor.name)}</div>
+                      <div>
+                        <div style={{ fontWeight: 500 }}>{m.mentor.name}</div>
+                        <div style={{ fontSize: "12px", color: "var(--text3)" }}>{m.mentor.email_id}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span className="badge badge-blue">{m.mentor.division || "—"}</span></td>
+                  <td>{m.mentor.years_of_exp} yrs</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
 }

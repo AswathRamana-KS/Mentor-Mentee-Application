@@ -1,135 +1,66 @@
 import { useEffect, useState } from "react"
-import API from "../services/api"
+import { getMentorshipRequests, acceptMenteeRequest, rejectMenteeRequest } from "../services/mentorService"
 
-export default function MentorRequests(){
+export default function MentorRequests() {
+  const [requests, setRequests] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-const [requests,setRequests] = useState<any[]>([])
+  useEffect(() => { load() }, [])
 
-useEffect(()=>{
-loadRequests()
-},[])
+  const load = async () => {
+    try { setRequests(await getMentorshipRequests()) }
+    catch (e) { console.error(e) }
+    finally { setLoading(false) }
+  }
 
-const loadRequests = async () => {
+  const accept = async (mr_id: number) => {
+    try { await acceptMenteeRequest(mr_id); alert("Accepted!"); load() }
+    catch (e: any) { alert(e?.response?.data?.detail || "Error") }
+  }
 
-try{
+  const reject = async (mr_id: number) => {
+    try { await rejectMenteeRequest(mr_id); alert("Rejected"); load() }
+    catch (e: any) { alert(e?.response?.data?.detail || "Error") }
+  }
 
-const res = await API.get("/mentorship")
+  const statusBadge = (s: string) => {
+    if (s === "Accepted") return <span className="badge badge-green">Accepted</span>
+    if (s === "Rejected") return <span className="badge badge-red">Rejected</span>
+    return <span className="badge badge-yellow">Pending</span>
+  }
 
-setRequests(res.data)
-
-}catch(error){
-
-console.error("Error loading mentee requests")
-
-}
-
-}
-
-const handleAccept = async (id:number) => {
-
-try{
-
-await API.post("/mentorship/accept",{
-mr_id:id
-})
-
-alert("Mentee Accepted")
-
-loadRequests()
-
-}catch(error){
-
-console.error("Accept failed")
-
-}
-
-}
-
-const handleReject = async (id:number) => {
-
-try{
-
-await API.post("/mentorship/reject",{
-mr_id:id
-})
-
-alert("Mentee Rejected")
-
-loadRequests()
-
-}catch(error){
-
-console.error("Reject failed")
-
-}
-
-}
-
-return(
-
-<div className="p-8">
-
-<h1 className="text-2xl font-bold mb-6">
-Mentee Requests
-</h1>
-
-<table className="w-full border">
-
-<thead>
-
-<tr className="bg-gray-200">
-
-<th className="border p-2">Mentee</th>
-<th className="border p-2">Skill</th>
-<th className="border p-2">Action</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{requests.map((r)=>(
-
-<tr key={r.mr_id}>
-
-<td className="border p-2">
-{r.mentee_id}
-</td>
-
-<td className="border p-2">
-{r.skill_id}
-</td>
-
-<td className="border p-2 flex gap-2">
-
-<button
-onClick={()=>handleAccept(r.mr_id)}
-className="bg-green-500 text-white px-3 py-1 rounded"
-
->
-
-Accept </button>
-
-<button
-onClick={()=>handleReject(r.mr_id)}
-className="bg-red-500 text-white px-3 py-1 rounded"
-
->
-
-Reject </button>
-
-</td>
-
-</tr>
-))}
-
-</tbody>
-
-</table>
-
-</div>
-
-)
-
+  return (
+    <div className="page">
+      <div className="page-header">
+        <h1 className="page-title">Mentorship Requests</h1>
+        <p className="page-sub">{requests.length} total request(s)</p>
+      </div>
+      <div className="table-card">
+        {loading ? <div className="loading">Loading...</div> :
+         requests.length === 0 ? <div className="empty">No requests yet.</div> : (
+          <table>
+            <thead><tr><th>Request ID</th><th>Mentee ID</th><th>Skill ID</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              {requests.map(r => (
+                <tr key={r.mr_id}>
+                  <td style={{ color: "var(--text3)" }}>#{r.mr_id}</td>
+                  <td style={{ fontWeight: 500 }}>#{r.mentee_id}</td>
+                  <td><span className="badge badge-blue">Skill #{r.skill_id}</span></td>
+                  <td>{statusBadge(r.status)}</td>
+                  <td>
+                    {r.status === "Pending" && (
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <button onClick={() => accept(r.mr_id)} className="btn btn-success btn-sm">Accept</button>
+                        <button onClick={() => reject(r.mr_id)} className="btn btn-danger btn-sm">Reject</button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
 }

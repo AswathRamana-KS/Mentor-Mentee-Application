@@ -1,39 +1,31 @@
 import { Link } from "react-router-dom"
 
-export default function AdminDashboard(){
+const cards = [
+  { to: "/add-employee",       icon: "👤", title: "Add Employee",      desc: "Create a new employee account" },
+  { to: "/create-skill",       icon: "⭐", title: "Create Skill",       desc: "Add a skill to the program" },
+  { to: "/add-practice-head",  icon: "🎯", title: "Add Practice Head",  desc: "Assign PH to a skill" },
+  { to: "/view-practice-heads",icon: "👥", title: "Practice Heads",     desc: "View all practice heads" },
+  { to: "/view-mentors",       icon: "🏅", title: "All Mentors",        desc: "View approved mentors" },
+  { to: "/view-mentees",       icon: "📚", title: "All Mentees",        desc: "View active mentorships" },
+]
 
-return(
-
-<div className="p-8">
-
-<h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-
-<div className="grid grid-cols-3 gap-6">
-
-<Link to="/add-employee" className="bg-white p-6 shadow rounded">
-<h2 className="text-xl font-semibold">Add Employee</h2>
-</Link>
-
-<Link to="/add-practice-head" className="bg-white p-6 shadow rounded">
-<h2 className="text-xl font-semibold">Add Practice Head</h2>
-</Link>
-
-<Link to="/create-skill" className="bg-white p-6 shadow rounded">
-<h2 className="text-xl font-semibold">Create Skill</h2>
-</Link>
-<Link to="/view-practice-heads" className="bg-white p-6 shadow rounded">
-<h2 className="text-xl font-semibold">View Practice Heads</h2>
-</Link>
-<Link to="/view-mentors" className="bg-white p-6 shadow rounded">
-<h2 className="text-xl font-semibold">View Mentors</h2>
-</Link>
-<Link to="/view-mentees" className="bg-white p-6 shadow rounded">
-<h2 className="text-xl font-semibold">View Mentees</h2>
-</Link>
-</div>
-
-</div>
-
-)
-
+export default function AdminDashboard() {
+  return (
+    <div className="page">
+      <div className="page-header">
+        <h1 className="page-title">Admin Dashboard</h1>
+        <p className="page-sub">Manage your mentorship program</p>
+      </div>
+      <div className="dashboard-grid">
+        {cards.map(c => (
+          <Link key={c.to} to={c.to} className="dashboard-card">
+            <div className="card-icon">{c.icon}</div>
+            <div className="card-title">{c.title}</div>
+            <div className="card-desc">{c.desc}</div>
+            <div className="card-arrow">Go →</div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  )
 }

@@ -18,8 +18,6 @@ export default function Register() {
       role
     });
 
-    // Tomorrow API will be called here
-    // API.post("/register", { name, email, password, role })
   };
 
   return (

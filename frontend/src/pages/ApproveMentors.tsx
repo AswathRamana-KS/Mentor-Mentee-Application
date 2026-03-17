@@ -1,120 +1,74 @@
 import { useEffect, useState } from "react"
-import { getMentorRequests, acceptMentorRequest } from "../services/mentorService"
+import { getMentorApplications, approveMentorApplication, rejectMentorApplication } from "../services/mentorService"
 import { Link } from "react-router-dom"
 
-export default function ApproveMentors(){
+export default function ApproveMentors() {
+  const [requests, setRequests] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-const [requests,setRequests]=useState<any[]>([])
+  useEffect(() => { load() }, [])
 
-useEffect(()=>{
+  const load = async () => {
+    try {
+      const data = await getMentorApplications()
+      setRequests(data.filter((r: any) => r.status === "Pending"))
+    } catch (e) { console.error(e) }
+    finally { setLoading(false) }
+  }
 
-loadRequests()
+  const approve = async (id: number) => {
+    try { await approveMentorApplication(id); alert("Approved!"); load() }
+    catch (e: any) { alert(e?.response?.data?.detail || "Error") }
+  }
 
-},[])
+  const reject = async (id: number) => {
+    try { await rejectMentorApplication(id); alert("Rejected"); load() }
+    catch (e: any) { alert(e?.response?.data?.detail || "Error") }
+  }
 
-const loadRequests = async ()=>{
+  return (
+    <div className="page">
+      <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div>
+          <h1 className="page-title">Mentor Applications</h1>
+          <p className="page-sub">{requests.length} pending</p>
+        </div>
+        <Link to="/mentors-by-skill" className="btn btn-secondary">View Mentors by Skill</Link>
+      </div>
 
-try{
-
-const data = await getMentorRequests()
-setRequests(data)
-
-}catch(error){
-
-console.error("Error loading requests")
-
-}
-
-}
-
-const handleApprove = async (id: number) => {
-
-try {
-
-
-await acceptMentorRequest(id)
-
-alert("Mentor Approved")
-
-loadRequests()
-
-
-} catch (error) {
-
-
-console.error("Approval failed", error)
-
-
-}
-
-}
-
-return(
-
-<div className="p-8">
-
-<h1 className="text-2xl font-bold mb-6">
-Mentor Applications
-</h1>
-
-<div className="mb-6">
-<Link
-to="/mentors-by-skill"
-className="bg-purple-600 text-white px-4 py-2 rounded"
->
-View Mentors By Skill
-</Link>
-</div>
-
-<table className="w-full border">
-
-<thead>
-
-<tr className="bg-gray-200">
-
-<th className="border p-2">Employee</th>
-<th className="border p-2">Skill</th>
-<th className="border p-2">Action</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{requests.map((r)=>(
-
-<tr key={r.ma_id}>
-
-<td className="border p-2">
-{r.employee?.name}
-</td>
-
-<td className="border p-2">
-{r.skill?.skill_name}
-</td>
-
-<td className="border p-2">
-
-<button
-onClick={() => handleApprove(r.ma_id)}
-className="bg-green-500 text-white px-3 py-1 rounded"
-
->
-
-Approve </button>
-
-</td>
-
-</tr>
-))}
-
-</tbody>
-
-</table>
-
-</div>
-
-)
-
+      <div className="table-card">
+        {loading ? <div className="loading">Loading...</div> :
+         requests.length === 0 ? <div className="empty">No pending applications.</div> : (
+          <table>
+            <thead><tr><th>Employee</th><th>Skill</th><th>Applied On</th><th>Actions</th></tr></thead>
+            <tbody>
+              {requests.map(r => (
+                <tr key={r.ma_id}>
+                  <td>
+                    <div className="name-cell">
+                      <div className="avatar">
+                        {r.employee?.name?.split(" ").map((n: string) => n[0]).join("").slice(0,2) || "?"}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 500 }}>{r.employee?.name ?? r.emp_id}</div>
+                        <div style={{ fontSize: "12px", color: "var(--text3)" }}>{r.employee?.email_id}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span className="badge badge-green">{r.skill?.skill_name ?? r.skill_id}</span></td>
+                  <td style={{ color: "var(--text2)" }}>{r.submitted_at}</td>
+                  <td>
+                    <div style={{ display: "flex", gap: "8px" }}>
+                      <button onClick={() => approve(r.ma_id)} className="btn btn-success btn-sm">Approve</button>
+                      <button onClick={() => reject(r.ma_id)} className="btn btn-danger btn-sm">Reject</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  )
 }

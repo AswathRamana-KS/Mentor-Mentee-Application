@@ -3,8 +3,6 @@ from datetime import date
 from typing import Optional
 
 
-
-# Employee -----------------------------------------------
 class EmployeeCreate(BaseModel):
     name: str
     email_id: EmailStr
@@ -13,7 +11,7 @@ class EmployeeCreate(BaseModel):
     division: Optional[str] = None
     date_of_joining: Optional[date] = None
     role_type: str
-    years_of_exp : int
+    years_of_exp: int
 
 class EmployeeResponse(BaseModel):
     emp_id: int
@@ -23,8 +21,7 @@ class EmployeeResponse(BaseModel):
     division: Optional[str]
     date_of_joining: Optional[date]
     role_type: str
-    years_of_exp : int
-
+    years_of_exp: int
     model_config = {"from_attributes": True}
 
 class LoginRequest(BaseModel):
@@ -36,115 +33,113 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
-# Skill -----------------------------------------------
+
 class SkillCreate(BaseModel):
     skill_name: str
 
 class SkillResponse(BaseModel):
     skill_id: int
     skill_name: str
-
     model_config = {"from_attributes": True}
 
 class SkillReqResponse(BaseModel):
-    mentor : EmployeeResponse
-    skill : SkillResponse
+    mentor: EmployeeResponse
+    skill: SkillResponse
 
 
-# Mentor -----------------------------------------------
 
 class MentorApplication(BaseModel):
-    skill_id : int
+    skill_id: int
 
 class MentorApplicationResponse(BaseModel):
     ma_id: int
-    emp_id : int
-    skill_id :int
-    status : str  
-    submitted_at : Optional[date]    
-    approved_at : Optional[date] 
-    approved_by : Optional[str]
-
+    emp_id: int
+    skill_id: int
+    status: str
+    submitted_at: Optional[date]
+    approved_at: Optional[date]
+    approved_by: Optional[str]
     employee: Optional[EmployeeResponse] = None
     skill: Optional[SkillResponse] = None
-
     model_config = {"from_attributes": True}
 
 class MentorApproval(BaseModel):
-    ma_id : int
+    ma_id: int
+
+class MentorRejection(BaseModel):
+    ma_id: int
 
 class MentorApprovalResponse(BaseModel):
-    m_id : int
+    m_id: int
     ma_id: int
-    emp_id : int
-    skill_id :int    
-
+    emp_id: int
+    skill_id: int
     model_config = {"from_attributes": True}
+
+
 
 class MentorShipRequest(BaseModel):
     mentor_id: int
-    skill_id :int
+    skill_id: int
 
 class MentorShipRequestResponse(BaseModel):
-    mr_id : int
+    mr_id: int
     mentor_id: int
-    mentee_id : int
-    skill_id :int   
-
+    mentee_id: int
+    skill_id: int
+    status: str
     model_config = {"from_attributes": True}
 
 class MentorShipAccept(BaseModel):
     mr_id: int
 
-class MentorShipAcceptResponse(BaseModel):
-    ms_id : int
-    mentor_id: int
-    mentee_id : int
-    skill_id :int   
+class MentorShipReject(BaseModel):
+    mr_id: int
 
+class MentorShipAcceptResponse(BaseModel):
+    ms_id: int
+    mentor_id: int
+    mentee_id: int
+    skill_id: int
     model_config = {"from_attributes": True}
 
 class MenteeResponse(BaseModel):
-    ms_id : int
+    ms_id: int
+    mentor_id: int
+    mentee_id: int
+    skill_id: int
     model_config = {"from_attributes": True}
 
 
-
-
-# PracticeHead ----------------------------------------
 
 class practiceHeadAddition(BaseModel):
-    emp_id : int
-    skill_id : int
+    emp_id: int
+    skill_id: int
 
 class practiceHeadResponse(BaseModel):
-    ph_id : int
-    emp_id : int
-    skill_id : int
-
-    employee: EmployeeResponse 
+    ph_id: int
+    emp_id: int
+    skill_id: int
+    employee: EmployeeResponse
     skill: SkillResponse
-
     model_config = {"from_attributes": True}
 
-# Goal -----------------------------------------------
+
 
 class GoalCreate(BaseModel):
-    title : str
-    desc : str
-    deadline : date
-    percent : float
+    title: str
+    desc: str
+    deadline: date
+    percent: float = 0.0
 
 class GoalResponse(BaseModel):
-
-    ms_id : int
-    title : str
-    desc : str
-    deadline : date
-    percent : float
+    g_id: int
+    ms_id: int
+    title: str
+    desc: str
+    deadline: date
+    percent: float
+    model_config = {"from_attributes": True}
 
 class GoalUpdatePercent(BaseModel):
     percent: float
-
-
-

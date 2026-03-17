@@ -1,147 +1,147 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { getMyProfile } from "../services/employeeService";
+import { Link, useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { getMyProfile } from "../services/employeeService"
+import { getMyMentorships, getMentorshipRequests, applyToBementor } from "../services/mentorService"
+import { getSkills } from "../services/skillService"
 
 export default function MenteeDashboard() {
+  const navigate = useNavigate()
+  const [user, setUser] = useState<any>(null)
+  const [mentorships, setMentorships] = useState<any[]>([])
+  const [pending, setPending] = useState<any[]>([])
+  const [skills, setSkills] = useState<any[]>([])
+  const [selectedSkill, setSelectedSkill] = useState("")
+  const [showApply, setShowApply] = useState(false)
+  const [applying, setApplying] = useState(false)
 
-const navigate = useNavigate();
+  useEffect(() => {
+    Promise.all([getMyProfile(), getMyMentorships(), getMentorshipRequests(), getSkills()])
+      .then(([p, m, r, s]) => {
+        setUser(p); setMentorships(m)
+        setPending(r.filter((x: any) => x.status === "Pending"))
+        setSkills(s)
+      }).catch(console.error)
+  }, [])
 
-const [user, setUser] = useState<any>(null);
-
-useEffect(() => {
-
-
-const loadProfile = async () => {
-  try {
-
-    const data = await getMyProfile();
-
-    setUser(data);
-
-  } catch (error) {
-
-    console.error("Error loading profile");
-
+  const handleApply = async (e: any) => {
+    e.preventDefault()
+    if (!selectedSkill) return
+    setApplying(true)
+    try {
+      await applyToBementor(Number(selectedSkill))
+      alert("Application submitted! Waiting for Practice Head approval.")
+      setShowApply(false); setSelectedSkill("")
+    } catch (err: any) {
+      alert(err?.response?.data?.detail || "Error submitting")
+    } finally { setApplying(false) }
   }
-};
 
-loadProfile();
+  const canApply = user && user.years_of_exp >= 7
 
-
-}, []);
-
-const handleLogout = () => {
-
-
-localStorage.removeItem("token");
-
-navigate("/");
-
-
-};
-
-return ( <div className="min-h-screen bg-gray-100 p-8">
-
-```
-  <div className="flex justify-between items-center mb-6">
-
-    <h1 className="text-3xl font-bold">
-      Welcome {user?.name || "Mentee"}
-    </h1>
-
-    <button
-      onClick={handleLogout}
-      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-    >
-      Logout
-    </button>
-
-  </div>
-
-  <div className="grid grid-cols-3 gap-6">
-
-    <div className="bg-white p-6 rounded-lg shadow-md">
-
-      <h2 className="text-xl font-semibold mb-3">
-        Find a Mentor
-      </h2>
-
-      <p className="text-gray-600 mb-4">
-        Browse available mentors based on their expertise.
-      </p>
-
-      <Link
-        to="/browse-mentors"
-        className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-      >
-        Browse Mentors
-      </Link>
-
-    </div>
-
-    <div className="bg-white p-6 rounded-lg shadow-md">
-
-      <h2 className="text-xl font-semibold mb-3">
-        My Mentorship
-      </h2>
-
-      <p className="text-gray-600 mb-4">
-        View your current mentorship and progress.
-      </p>
-
-      <Link
-        to="/goals"
-        className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-      >
-        View Goals
-      </Link>
-
-    </div>
-
-    <div className="bg-white p-6 rounded-lg shadow-md">
-
-      <h2 className="text-xl font-semibold mb-3">
-        Request Status
-      </h2>
-
-      <p className="text-gray-600 mb-4">
-        Track mentor requests you have sent.
-      </p>
-
-      <Link
-        to="/mentor-requests"
-        className="bg-gray-800 text-white px-4 py-2 rounded"
-      >
-        View Requests
-      </Link>
-
-    </div>
-
-  </div>
-
-  <div className="bg-white p-6 rounded-lg shadow-md mt-8">
-
-    <h2 className="text-xl font-semibold mb-4">
-      Current Mentor
-    </h2>
-
-    <p><strong>Name:</strong> Rahul Sharma</p>
-    <p><strong>Skill:</strong> Python Development</p>
-
-    <div className="mt-4">
-
-      <p className="font-semibold mb-2">Progress</p>
-
-      <div className="w-full bg-gray-300 rounded h-4">
-        <div className="bg-purple-600 h-4 rounded w-2/5"></div>
+  return (
+    <div className="page">
+      <div className="page-header">
+        <h1 className="page-title">Welcome, {user?.name || "..."}</h1>
+        <p className="page-sub">Your mentorship overview</p>
       </div>
 
+      
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-label">Active Mentorships</div>
+          <div className="stat-value">{mentorships.length}</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Pending Requests</div>
+          <div className="stat-value">{pending.length}</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Experience</div>
+          <div className="stat-value">{user?.years_of_exp ?? "—"}<span style={{ fontSize: "14px", color: "var(--text3)" }}> yrs</span></div>
+        </div>
+      </div>
+
+     
+      <div className="dashboard-grid" style={{ marginBottom: "28px" }}>
+        <Link to="/browse-mentors" className="dashboard-card">
+          <div className="card-icon">🔍</div>
+          <div className="card-title">Browse Mentors</div>
+          <div className="card-desc">Find a mentor by skill</div>
+          <div className="card-arrow">Go →</div>
+        </Link>
+        {mentorships.length > 0 && (
+          <Link to="/goals" className="dashboard-card">
+            <div className="card-icon">📈</div>
+            <div className="card-title">My Goals</div>
+            <div className="card-desc">{mentorships.length} active mentorship(s)</div>
+            <div className="card-arrow">View →</div>
+          </Link>
+        )}
+        <Link to="/mentor-requests" className="dashboard-card">
+          <div className="card-icon">📬</div>
+          <div className="card-title">My Requests</div>
+          <div className="card-desc">{pending.length} pending request(s)</div>
+          <div className="card-arrow">View →</div>
+        </Link>
+      </div>
+
+      
+      <div className="card" style={{ marginBottom: "24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <div className="card-title">Become a Mentor</div>
+            <div className="card-desc" style={{ marginTop: "4px" }}>
+              {canApply
+                ? "You're eligible! Apply to mentor others in a skill."
+                : `Requires 7+ years of experience. You have ${user?.years_of_exp ?? "..."} year(s).`}
+            </div>
+          </div>
+          {canApply && (
+            <button onClick={() => setShowApply(s => !s)} className="btn btn-primary">
+              {showApply ? "Cancel" : "Apply to Mentor"}
+            </button>
+          )}
+        </div>
+        {showApply && canApply && (
+          <>
+            <hr className="divider" />
+            <form onSubmit={handleApply} style={{ display: "flex", gap: "12px", alignItems: "flex-end" }}>
+              <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+                <label>Select Skill</label>
+                <select value={selectedSkill} onChange={e => setSelectedSkill(e.target.value)} required>
+                  <option value="">— Select Skill —</option>
+                  {skills.map(s => <option key={s.skill_id} value={s.skill_id}>{s.skill_name}</option>)}
+                </select>
+              </div>
+              <button type="submit" disabled={applying} className="btn btn-success">
+                {applying ? "Submitting..." : "Submit"}
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+
+      {/* Active mentorships */}
+      {mentorships.length > 0 && (
+        <>
+          <h2 className="section-title">Active Mentorships</h2>
+          <div className="table-card">
+            <table>
+              <thead><tr><th>Mentorship ID</th><th>Mentor ID</th><th>Skill</th><th></th></tr></thead>
+              <tbody>
+                {mentorships.map(ms => (
+                  <tr key={ms.ms_id}>
+                    <td style={{ color: "var(--text3)" }}>#{ms.ms_id}</td>
+                    <td style={{ fontWeight: 500 }}>#{ms.mentor_id}</td>
+                    <td><span className="badge badge-green">Skill #{ms.skill_id}</span></td>
+                    <td><Link to="/goals" style={{ color: "var(--teal-400)", fontSize: "13px", textDecoration: "none" }}>View Goals →</Link></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
-
-  </div>
-
-</div>
-
-
-);
+  )
 }

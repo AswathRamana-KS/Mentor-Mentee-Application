@@ -1,103 +1,139 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from database import get_db
 import models
 import schemas
 from auth import require_mentor_eligible, get_current_user, require_practiceHead
-from datetime import datetime, timedelta
+from datetime import datetime
 
 router = APIRouter(prefix="/mentor", tags=["Mentor"])
 
 
-@router.post("/mapp", response_model=schemas.MentorApplicationResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/mapp", response_model=schemas.MentorApplicationResponse, status_code=201)
 def apply_mentorship(
-    mentor_data : schemas.MentorApplication,
+    mentor_data: schemas.MentorApplication,
     db: Session = Depends(get_db),
     mentor: models.Employee = Depends(require_mentor_eligible)
 ):
-
     existing = db.query(models.MentorApplication).filter(
         models.MentorApplication.emp_id == mentor.emp_id,
         models.MentorApplication.skill_id == mentor_data.skill_id,
         models.MentorApplication.status == "Pending"
     ).first()
-
     if existing:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Application already exists"
-        )
+        raise HTTPException(status_code=400, detail="Application already exists")
 
-    new_mentor_app = models.MentorApplication(
-        emp_id = mentor.emp_id,
-        status = "Pending",
-        skill_id = mentor_data.skill_id,
-        submitted_at = datetime.now().date(),
-        approved_by = None,
-        approved_at = None
+    new_app = models.MentorApplication(
+        emp_id=mentor.emp_id,
+        status="Pending",
+        skill_id=mentor_data.skill_id,
+        submitted_at=datetime.now().date(),
+        approved_by=None,
+        approved_at=None
     )
-
-    db.add(new_mentor_app)
+    db.add(new_app)
     db.commit()
-    db.refresh(new_mentor_app)
+    db.refresh(new_app)
 
-    return new_mentor_app
+    # FIXED: reload with relationships so employee + skill are not null in response
+    return db.query(models.MentorApplication).options(
+        joinedload(models.MentorApplication.employee),
+        joinedload(models.MentorApplication.skill)
+    ).filter(models.MentorApplication.ma_id == new_app.ma_id).first()
 
 
-@router.get("/", response_model=list[schemas.MentorApplicationResponse], summary="Get All Mentor Applications")
+# FIXED: renamed from GET /mentor/ to GET /mentor/mapp/all to avoid route clash
+@router.get("/mapp/all", response_model=list[schemas.MentorApplicationResponse])
 def get_all_mapp(
     db: Session = Depends(get_db),
     current_user: models.Employee = Depends(get_current_user)
 ):
+    query = db.query(models.MentorApplication).options(
+        joinedload(models.MentorApplication.employee),
+        joinedload(models.MentorApplication.skill)
+    )
     if current_user.role_type == "Admin":
-        return db.query(models.MentorApplication).all()
+        return query.all()
 
-    ph_skills = db.query(models.PracticeHead.skill_id).filter(
+    ph_skills = [s[0] for s in db.query(models.PracticeHead.skill_id).filter(
         models.PracticeHead.emp_id == current_user.emp_id
-    ).all()
+    ).all()]
 
-    skill_ids = [s[0] for s in ph_skills]
+    if ph_skills:
+        return query.filter(models.MentorApplication.skill_id.in_(ph_skills)).all()
 
-    if skill_ids:
-        return db.query(models.MentorApplication).filter(
-            models.MentorApplication.skill_id.in_(skill_ids)
-        ).all()
-    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-           detail="Only admins and practice heads can perform this action"
-        )
+    raise HTTPException(status_code=403, detail="Only admins and practice heads can view applications")
 
-@router.post("/mapprov",response_model= schemas.MentorApprovalResponse, summary="Approve Mentor")
+
+@router.post("/mapprov", response_model=schemas.MentorApprovalResponse)
 def mentor_approval(
-    m_data : schemas.MentorApproval,   
-    db : Session = Depends(get_db),
-    ph : models.PracticeHead = Depends(require_practiceHead)
+    m_data: schemas.MentorApproval,
+    db: Session = Depends(get_db),
+    ph: models.PracticeHead = Depends(require_practiceHead)
 ):
-    application = db.query(models.MentorApplication).filter(models.MentorApplication.ma_id == m_data.ma_id).first()
-
+    application = db.query(models.MentorApplication).filter(
+        models.MentorApplication.ma_id == m_data.ma_id
+    ).first()
     if not application:
-        raise HTTPException(status_code=404, detail="Mentor application not found")
-    
+        raise HTTPException(status_code=404, detail="Application not found")
     if application.status == "Approved":
-        raise HTTPException(status_code=400, detail="Application is already approved")
-    
-    if application.skill_id != ph.skill_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only approve applications for your practice area skill."
-        )
-    
+        raise HTTPException(status_code=400, detail="Already approved")
+
+    # FIX: get ALL skills this practice head manages, not just the first one
+    ph_skill_ids = [
+        row.skill_id for row in db.query(models.PracticeHead).filter(
+            models.PracticeHead.emp_id == ph.emp_id
+        ).all()
+    ]
+
+    if application.skill_id not in ph_skill_ids:
+        raise HTTPException(status_code=403, detail="You can only approve for your own skill")
+
     application.status = "Approved"
     application.approved_at = datetime.now().date()
     application.approved_by = ph.employee.name
 
     new_mentor = models.Mentors(
-        ma_id = application.ma_id,    
-        emp_id = application.emp_id,
-        skill_id = application.skill_id
+        ma_id=application.ma_id,
+        emp_id=application.emp_id,
+        skill_id=application.skill_id
     )
-
     db.add(new_mentor)
     db.commit()
     db.refresh(new_mentor)
-
     return new_mentor
+
+
+# NEW: reject a mentor application
+@router.post("/mapreject", response_model=schemas.MentorApplicationResponse)
+def mentor_rejection(
+    m_data: schemas.MentorRejection,
+    db: Session = Depends(get_db),
+    ph: models.PracticeHead = Depends(require_practiceHead)
+):
+    application = db.query(models.MentorApplication).options(
+        joinedload(models.MentorApplication.employee),
+        joinedload(models.MentorApplication.skill)
+    ).filter(models.MentorApplication.ma_id == m_data.ma_id).first()
+
+    if not application:
+        raise HTTPException(status_code=404, detail="Application not found")
+    if application.status != "Pending":
+        raise HTTPException(status_code=400, detail=f"Application is already {application.status}")
+
+    
+    ph_skill_ids = [
+        row.skill_id for row in db.query(models.PracticeHead).filter(
+            models.PracticeHead.emp_id == ph.emp_id
+        ).all()
+    ]
+
+    if application.skill_id not in ph_skill_ids:
+        raise HTTPException(status_code=403, detail="You can only reject for your own skill")
+
+    application.status = "Rejected"
+    application.approved_at = datetime.now().date()
+    application.approved_by = ph.employee.name
+    db.commit()
+    db.refresh(application)
+    return application
