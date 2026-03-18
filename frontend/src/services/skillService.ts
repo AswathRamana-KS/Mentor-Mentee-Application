@@ -8,10 +8,9 @@ export const addSkill = async (data:any) => {
 
 }
 
-// NEW FUNCTION
 export const getSkills = async () => {
 
-  const response = await API.get("/skills")
+  const response = await API.get("/skills/")
 
   return response.data
 
