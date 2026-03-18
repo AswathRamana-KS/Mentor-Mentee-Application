@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from datetime import date
-from typing import Optional
+from typing import Optional, List
 
 
 class EmployeeCreate(BaseModel):
@@ -24,14 +24,18 @@ class EmployeeResponse(BaseModel):
     years_of_exp: int
     model_config = {"from_attributes": True}
 
-class LoginRequest(BaseModel):
-    email_id: EmailStr
-    password: str
+class LoginInitResponse(BaseModel):
+    email: str
+    requires_role_selection: bool
+    roles: List[str]
+
+class LoginCompleteRequest(BaseModel):
+    email: str
+    role: str
 
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
-
 
 
 class SkillCreate(BaseModel):
@@ -45,7 +49,6 @@ class SkillResponse(BaseModel):
 class SkillReqResponse(BaseModel):
     mentor: EmployeeResponse
     skill: SkillResponse
-
 
 
 class MentorApplication(BaseModel):
@@ -75,7 +78,6 @@ class MentorApprovalResponse(BaseModel):
     emp_id: int
     skill_id: int
     model_config = {"from_attributes": True}
-
 
 
 class MentorShipRequest(BaseModel):
@@ -111,7 +113,6 @@ class MenteeResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-
 class practiceHeadAddition(BaseModel):
     emp_id: int
     skill_id: int
@@ -125,12 +126,26 @@ class practiceHeadResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+# Checkpoint schemas
+class CheckpointCreate(BaseModel):
+    text: str
 
+class CheckpointResponse(BaseModel):
+    cp_id: int
+    g_id: int
+    text: str
+    is_done: bool
+    model_config = {"from_attributes": True}
+
+class CheckpointToggle(BaseModel):
+    is_done: bool
+
+
+# Goal schemas
 class GoalCreate(BaseModel):
     title: str
     desc: str
     deadline: date
-    percent: float = 0.0
 
 class GoalResponse(BaseModel):
     g_id: int
@@ -139,7 +154,5 @@ class GoalResponse(BaseModel):
     desc: str
     deadline: date
     percent: float
+    checkpoints: List[CheckpointResponse] = []
     model_config = {"from_attributes": True}
-
-class GoalUpdatePercent(BaseModel):
-    percent: float

@@ -13,10 +13,10 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY") or "supersecretkey123"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login/init")
 
 
 def hash_password(password: str) -> str:
@@ -59,19 +59,13 @@ def get_current_user(
 
 def require_admin(current_user: models.Employee = Depends(get_current_user)):
     if current_user.role_type != "Admin":
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only admins can perform this action"
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only admins can do this")
     return current_user
 
 
 def require_mentor_eligible(current_user: models.Employee = Depends(get_current_user)):
     if current_user.years_of_exp < 7:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="7+ years of experience required to become mentor"
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="7+ years of experience required")
     return current_user
 
 
@@ -79,14 +73,9 @@ def require_mentor(
     db: Session = Depends(get_db),
     user: models.Employee = Depends(get_current_user)
 ) -> models.Employee:
-    mentor = db.query(models.Mentors).filter(
-        models.Mentors.emp_id == user.emp_id
-    ).first()
+    mentor = db.query(models.Mentors).filter(models.Mentors.emp_id == user.emp_id).first()
     if mentor is None:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only approved mentors can perform this action."
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only approved mentors can do this")
     return user
 
 
@@ -94,16 +83,10 @@ def require_practiceHead(
     db: Session = Depends(get_db),
     user: models.Employee = Depends(get_current_user)
 ) -> models.PracticeHead:
-    
     ph = db.query(models.PracticeHead).options(
         joinedload(models.PracticeHead.employee),
         joinedload(models.PracticeHead.skill)
-    ).filter(
-        models.PracticeHead.emp_id == user.emp_id
-    ).first()
+    ).filter(models.PracticeHead.emp_id == user.emp_id).first()
     if ph is None:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Only practice heads can perform this action."
-        )
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only practice heads can do this")
     return ph
