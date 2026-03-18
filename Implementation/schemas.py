@@ -31,7 +31,7 @@ class EmployeeResponse(BaseModel):
 
 class LoginInitResponse(BaseModel):
     email: str
-    status: str
+    requires_role_selection: bool
     roles: List[str]
 
 

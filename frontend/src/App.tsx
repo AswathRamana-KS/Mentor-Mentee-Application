@@ -8,7 +8,7 @@ function App() {
     <Router>
       <Routes>
         {/* Define your route here */}
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Enroll />} />
         {/* You should also add your register route since you use it in Link */}
         <Route path="/register" element={<div>Register Page</div>} />
       </Routes>

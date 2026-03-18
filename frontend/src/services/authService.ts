@@ -1,20 +1,24 @@
 import API from "./api";
 
-export const loginUser = async (email: string, password: string) => {
 
-  const params = new URLSearchParams();
+export const loginInit = async (email: string, password: string) => {
+    console.log("Trying it log in"+email+password)
+    const formData = new URLSearchParams()
+    formData.append("username", email)
+    formData.append("password", password)
 
-  params.append("username", email);
-  params.append("password", password);
+    const res = await API.post(`auth/login/init`, formData)
+    console.log(res)
+    return res.data
+}
 
-  const response = await API.post("/auth/login", params, {
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  });
-
-  return response.data;
-};
+export const loginComplete = async (email: string, role: string) => {
+    const res = await API.post(`auth/login/complete`, {
+        email,
+        role
+    })
+    return res.data
+}
 
 export const enrollUser = async (email: string, password: string, isMentor : boolean, selectedSkillId : number) => {
 

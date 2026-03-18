@@ -3,71 +3,109 @@ from sqlalchemy.orm import Session
 from database import get_db
 import models
 import schemas
-from auth import verify_password, create_access_token, get_current_user
+from auth import verify_password, create_access_token
 from fastapi.security import OAuth2PasswordRequestForm
-from datetime import datetime
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
-@router.post("/login/init")
+
+# ---------------------------
+# LOGIN INIT
+# ---------------------------
+@router.post("/login/init", response_model=schemas.LoginInitResponse)
 def login_init(
     credentials: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
+    print(credentials.username,credentials.password)
     employee = db.query(models.Employee).filter(
         models.Employee.email_id == credentials.username
     ).first()
 
     if not employee or not verify_password(credentials.password, employee.hashed_password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
 
-    roles = []
-
+    # Priority roles → direct login
     if employee.role_type == "Admin":
-        roles.append("Admin")
+        return {
+            "email": employee.email_id,
+            "requires_role_selection": False,
+            "roles": ["Admin"]
+        }
 
     if db.query(models.PracticeHead).filter(
         models.PracticeHead.emp_id == employee.emp_id
     ).first():
-        roles.append("PracticeHead")
+        return {
+            "email": employee.email_id,
+            "requires_role_selection": False,
+            "roles": ["PracticeHead"]
+        }
 
-    if db.query(models.Mentors).filter(
+    # Check mentor/mentee
+    is_mentor = db.query(models.Mentors).filter(
         models.Mentors.emp_id == employee.emp_id
-    ).first():
-        roles.append("Mentor")
+    ).first()
 
-    if db.query(models.Mentee).filter(
+    is_mentee = db.query(models.Mentee).filter(
         models.Mentee.emp_id == employee.emp_id
-    ).first():
-        roles.append("Mentee")
+    ).first()
 
-    if not roles:
-        raise HTTPException(status_code=403, detail="No valid role")
+    # BOTH → require selection
+    if is_mentor and is_mentee:
+        return {
+            "email": employee.email_id,
+            "requires_role_selection": True,
+            "roles": ["Mentor", "Mentee"]
+        }
 
-    return {
-        "email": employee.email_id,
-        "status": "multiple_roles" if len(roles) > 1 else "single_role",
-        "roles": roles
-    }
+    # SINGLE → direct login
+    if is_mentor:
+        return {
+            "email": employee.email_id,
+            "requires_role_selection": False,
+            "roles": ["Mentor"]
+        }
 
+    if is_mentee:
+        return {
+            "email": employee.email_id,
+            "requires_role_selection": False,
+            "roles": ["Mentee"]
+        }
+
+    raise HTTPException(
+        status_code=403,
+        detail="User has no valid role"
+    )
+
+
+# ---------------------------
+# LOGIN COMPLETE
+# ---------------------------
 @router.post("/login/complete", response_model=schemas.TokenResponse)
 def login_complete(
-    email: str,
-    role: str,
+    data: schemas.LoginCompleteRequest,
     db: Session = Depends(get_db)
 ):
     employee = db.query(models.Employee).filter(
-        models.Employee.email_id == email
+        models.Employee.email_id == data.email
     ).first()
 
     if not employee:
         raise HTTPException(status_code=404, detail="User not found")
 
     token = create_access_token(
-        data={"sub": employee.email_id, "role": role}
+        data={"sub": employee.email_id, "role": data.role}
     )
 
-    return {"access_token": token, "token_type": "bearer"}
+    return {
+        "access_token": token,
+        "token_type": "bearer"
+    }
 
 """
 @router.post("/login", response_model=schemas.TokenResponse)
