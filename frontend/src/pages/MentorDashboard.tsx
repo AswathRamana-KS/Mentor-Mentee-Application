@@ -36,7 +36,6 @@ export default function MentorDashboard() {
         <p className="page-sub">{mentees.length} active mentee(s)</p>
       </div>
 
-      {/* Quick actions */}
       <div className="dashboard-grid" style={{ marginBottom: "28px" }}>
         <Link to="/update-goal" className="dashboard-card">
           <div className="card-icon">🎯</div>
@@ -54,7 +53,6 @@ export default function MentorDashboard() {
         </div>
       </div>
 
-      {/* Pending requests */}
       <h2 className="section-title">Pending Requests</h2>
       <div className="table-card" style={{ marginBottom: "28px" }}>
         {requests.length === 0 ? <div className="empty">No pending requests.</div> : (
@@ -78,7 +76,6 @@ export default function MentorDashboard() {
         )}
       </div>
 
-      {/* Active mentees */}
       {mentees.length > 0 && (
         <>
           <h2 className="section-title">My Mentees</h2>

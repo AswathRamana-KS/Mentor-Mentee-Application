@@ -125,8 +125,6 @@ class practiceHeadResponse(BaseModel):
     skill: SkillResponse
     model_config = {"from_attributes": True}
 
-
-# Checkpoint schemas
 class CheckpointCreate(BaseModel):
     text: str
 
@@ -140,8 +138,6 @@ class CheckpointResponse(BaseModel):
 class CheckpointToggle(BaseModel):
     is_done: bool
 
-
-# Goal schemas
 class GoalCreate(BaseModel):
     title: str
     desc: str

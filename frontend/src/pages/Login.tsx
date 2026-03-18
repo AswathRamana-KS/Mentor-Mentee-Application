@@ -8,7 +8,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  // For dual-role users (mentor + mentee)
   const [needsRoleSelect, setNeedsRoleSelect] = useState(false)
   const [selectedRole, setSelectedRole] = useState<"Mentor" | "Mentee">("Mentee")
 
@@ -31,14 +30,12 @@ export default function Login() {
       const res = await loginInit(email, password)
 
       if (!res.requires_role_selection) {
-        // Single role — log straight in
         const role = res.roles[0]
         const tokenRes = await loginComplete(email, role)
         localStorage.setItem("token", tokenRes.access_token)
         localStorage.setItem("role", role.toLowerCase())
         goToDashboard(role)
       } else {
-        // User is both mentor and mentee — ask them to pick
         setNeedsRoleSelect(true)
       }
     } catch {

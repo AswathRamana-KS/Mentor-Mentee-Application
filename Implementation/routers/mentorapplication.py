@@ -35,14 +35,11 @@ def apply_mentorship(
     db.commit()
     db.refresh(new_app)
 
-    # FIXED: reload with relationships so employee + skill are not null in response
     return db.query(models.MentorApplication).options(
         joinedload(models.MentorApplication.employee),
         joinedload(models.MentorApplication.skill)
     ).filter(models.MentorApplication.ma_id == new_app.ma_id).first()
 
-
-# FIXED: renamed from GET /mentor/ to GET /mentor/mapp/all to avoid route clash
 @router.get("/mapp/all", response_model=list[schemas.MentorApplicationResponse])
 def get_all_mapp(
     db: Session = Depends(get_db),
@@ -79,7 +76,6 @@ def mentor_approval(
     if application.status == "Approved":
         raise HTTPException(status_code=400, detail="Already approved")
 
-    # FIX: get ALL skills this practice head manages, not just the first one
     ph_skill_ids = [
         row.skill_id for row in db.query(models.PracticeHead).filter(
             models.PracticeHead.emp_id == ph.emp_id
@@ -103,8 +99,6 @@ def mentor_approval(
     db.refresh(new_mentor)
     return new_mentor
 
-
-# NEW: reject a mentor application
 @router.post("/mapreject", response_model=schemas.MentorApplicationResponse)
 def mentor_rejection(
     m_data: schemas.MentorRejection,

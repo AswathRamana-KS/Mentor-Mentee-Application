@@ -81,7 +81,6 @@ export default function Goals() {
                       {g.desc}
                     </p>
 
-                    {/* Progress */}
                     <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
                       <div className="progress-wrap">
                         <div className="progress-bar" style={{ width: `${g.percent}%` }} />
@@ -91,7 +90,6 @@ export default function Goals() {
                       </span>
                     </div>
 
-                    {/* Checkpoints */}
                     {total > 0 && (
                       <div>
                         <div style={{ fontSize: "12px", color: "var(--text3)", marginBottom: "8px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px" }}>

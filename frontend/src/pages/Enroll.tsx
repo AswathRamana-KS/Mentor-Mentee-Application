@@ -35,11 +35,9 @@ export default function Enroll() {
       const res = await enrollUser(email, password, isMentor, Number(selectedSkillId))
 
       if (isMentor) {
-        // Mentor application submitted, they need to wait for approval
         alert(res.message || "Mentor application submitted! A Practice Head will review it.")
         navigate("/")
       } else {
-        // Mentee enrolled and got a token
         localStorage.setItem("token", res.access_token)
         localStorage.setItem("role", "mentee")
         navigate("/mentee-dashboard")

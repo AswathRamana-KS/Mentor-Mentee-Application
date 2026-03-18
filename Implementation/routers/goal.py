@@ -69,9 +69,6 @@ def get_mentee_goals(
         joinedload(models.Goal.checkpoints)
     ).filter(models.Goal.ms_id == ms_id).all()
 
-
-# -- Checkpoint endpoints --
-
 @router.post("/goal/{g_id}/checkpoint", response_model=schemas.CheckpointResponse)
 def add_checkpoint(
     g_id: int,

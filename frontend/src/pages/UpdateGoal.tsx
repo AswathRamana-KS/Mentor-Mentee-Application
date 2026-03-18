@@ -9,13 +9,11 @@ export default function UpdateGoal() {
   const [msId, setMsId] = useState(searchParams.get("ms_id") || "")
   const [tab, setTab] = useState<"create" | "checkpoints">("create")
 
-  // Create goal form
   const [title, setTitle] = useState("")
   const [desc, setDesc] = useState("")
   const [deadline, setDeadline] = useState("")
   const [creating, setCreating] = useState(false)
 
-  // Checkpoints tab
   const [goals, setGoals] = useState<any[]>([])
   const [selectedGoalId, setSelectedGoalId] = useState("")
   const [newCheckpointText, setNewCheckpointText] = useState("")
@@ -101,7 +99,6 @@ export default function UpdateGoal() {
 
       <div className="form-card" style={{ maxWidth: "580px" }}>
 
-        {/* Tab switcher */}
         <div style={{ display: "flex", gap: "8px", marginBottom: "24px" }}>
           <button
             onClick={() => setTab("create")}
@@ -117,7 +114,6 @@ export default function UpdateGoal() {
           </button>
         </div>
 
-        {/* Mentee selector (shared) */}
         <div className="form-group">
           <label>Select Mentee</label>
           <select value={msId} onChange={e => { setMsId(e.target.value); setSelectedGoalId("") }}>
@@ -130,7 +126,6 @@ export default function UpdateGoal() {
           </select>
         </div>
 
-        {/* CREATE GOAL TAB */}
         {tab === "create" && (
           <form onSubmit={handleCreateGoal}>
             <div className="form-group">
@@ -168,7 +163,6 @@ export default function UpdateGoal() {
           </form>
         )}
 
-        {/* CHECKPOINTS TAB */}
         {tab === "checkpoints" && (
           <div>
             {!msId ? (
@@ -190,7 +184,6 @@ export default function UpdateGoal() {
 
                 {currentGoal && (
                   <>
-                    {/* Progress bar */}
                     <div style={{ marginBottom: "20px" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
                         <span style={{ fontSize: "13px", color: "var(--text2)" }}>Progress</span>
@@ -203,7 +196,6 @@ export default function UpdateGoal() {
                       </div>
                     </div>
 
-                    {/* Existing checkpoints */}
                     <div style={{ marginBottom: "20px" }}>
                       {currentGoal.checkpoints.length === 0 ? (
                         <p style={{ color: "var(--text3)", fontSize: "13px" }}>No checkpoints yet. Add one below.</p>
@@ -254,7 +246,6 @@ export default function UpdateGoal() {
                       )}
                     </div>
 
-                    {/* Add new checkpoint */}
                     <form onSubmit={handleAddCheckpoint} style={{ display: "flex", gap: "8px" }}>
                       <input
                         placeholder="Add a checkpoint..."

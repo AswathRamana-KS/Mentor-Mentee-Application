@@ -121,7 +121,6 @@ export default function MenteeDashboard() {
         )}
       </div>
 
-      {/* Active mentorships */}
       {mentorships.length > 0 && (
         <>
           <h2 className="section-title">Active Mentorships</h2>
