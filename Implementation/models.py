@@ -47,6 +47,13 @@ class Mentors(Base):
     mentor = relationship("Employee")
     skill = relationship("Skills")
 
+class Mentee(Base):
+    __tablename__ = "mentee"
+
+    emp_id = Column(Integer, ForeignKey("employees.emp_id"), primary_key=True)
+    
+    mentee = relationship("Employee")
+
 class PracticeHead(Base):
     __tablename__ = "practice_head"
 

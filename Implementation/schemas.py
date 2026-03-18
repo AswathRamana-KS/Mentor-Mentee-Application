@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from datetime import date
-from typing import Optional
+from typing import Optional, List
 
 
 
@@ -27,9 +27,21 @@ class EmployeeResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
-class LoginRequest(BaseModel):
-    email_id: EmailStr
-    password: str
+# Login ---------------------------------------------------
+
+class LoginInitResponse(BaseModel):
+    email: str
+    status: str
+    roles: List[str]
+
+
+class LoginCompleteRequest(BaseModel):
+    email: str
+    role: str
+
+# class LoginRequest(BaseModel):
+#     email_id: EmailStr
+#     password: str
 
 class TokenResponse(BaseModel):
     access_token: str
