@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
+import { AuthProvider } from "./context/AuthContext"
+import ErrorBoundary from "./components/ErrorBoundary"
 import Navbar from "./layout/Navbar"
 import Login from "./pages/Login"
 import Enroll from "./pages/Enroll"
@@ -48,7 +50,7 @@ function Layout() {
 
         <Route path="/mentee-dashboard" element={<ProtectedRoute roles={["mentee"]}><MenteeDashboard /></ProtectedRoute>} />
         <Route path="/browse-mentors" element={<ProtectedRoute roles={["mentee"]}><BrowseMentors /></ProtectedRoute>} />
-        <Route path="/mentor-requests" element={<ProtectedRoute roles={["mentee"]}><MentorRequests /></ProtectedRoute>} />
+        <Route path="/mentor-requests" element={<ProtectedRoute roles={["mentee", "mentor"]}><MentorRequests /></ProtectedRoute>} />
         <Route path="/goals" element={<ProtectedRoute roles={["mentee"]}><Goals /></ProtectedRoute>} />
       </Routes>
     </>
@@ -58,7 +60,11 @@ function Layout() {
 export default function App() {
   return (
     <BrowserRouter>
-      <Layout />
+      <ErrorBoundary>
+        <AuthProvider>
+          <Layout />
+        </AuthProvider>
+      </ErrorBoundary>
     </BrowserRouter>
   )
 }

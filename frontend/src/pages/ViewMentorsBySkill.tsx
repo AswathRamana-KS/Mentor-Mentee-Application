@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
-import { getSkills } from "../services/skillService"
-import { getMentorsBySkill } from "../services/mentorService"
+import { getPhSkills, getMentorsBySkill } from "../services/mentorService"
 
 function initials(name: string) {
   return name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "?"
@@ -12,7 +11,9 @@ export default function ViewMentorsBySkill() {
   const [mentors, setMentors] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => { getSkills().then(setSkills).catch(console.error) }, [])
+  useEffect(() => {
+    getPhSkills().then(setSkills).catch(console.error)
+  }, [])
 
   const handleChange = async (id: string) => {
     setSelected(id)
@@ -27,7 +28,7 @@ export default function ViewMentorsBySkill() {
     <div className="page">
       <div className="page-header">
         <h1 className="page-title">Mentors by Skill</h1>
-        <p className="page-sub">View approved mentors for each skill</p>
+        <p className="page-sub">View approved mentors for your skills</p>
       </div>
 
       <div style={{ marginBottom: "24px", maxWidth: "320px" }}>

@@ -4,7 +4,7 @@ import { getMentorshipRequests, acceptMenteeRequest, rejectMenteeRequest } from 
 export default function MentorRequests() {
   const [requests, setRequests] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  
+
   const userRole = localStorage.getItem("role")?.toLowerCase() || "mentee"
   const isMentor = userRole === "mentor"
 
@@ -38,16 +38,15 @@ export default function MentorRequests() {
         <h1 className="page-title">Mentorship Requests</h1>
         <p className="page-sub">{requests.length} total request(s)</p>
       </div>
-      
+
       <div className="table-card">
         {loading ? <div className="loading">Loading...</div> :
          requests.length === 0 ? <div className="empty">No requests yet.</div> : (
           <table>
             <thead>
               <tr>
-                <th>Request ID</th>
-                <th>{isMentor ? "Mentee ID" : "Mentor ID"}</th>
-                <th>Skill ID</th>
+                <th>{isMentor ? "Mentee" : "Mentor"}</th>
+                <th>Skill</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -55,13 +54,13 @@ export default function MentorRequests() {
             <tbody>
               {requests.map(r => (
                 <tr key={r.mr_id}>
-                  <td style={{ color: "var(--text3)" }}>#{r.mr_id}</td>
-                  
                   <td style={{ fontWeight: 500 }}>
-                    #{isMentor ? r.mentee_id : r.mentor_id}
+                    {isMentor
+                      ? (r.mentee_name ?? `#${r.mentee_id}`)
+                      : (r.mentor_name ?? `#${r.mentor_id}`)
+                    }
                   </td>
-                  
-                  <td><span className="badge badge-blue">Skill #{r.skill_id}</span></td>
+                  <td><span className="badge badge-blue">{r.skill_name ?? `Skill #${r.skill_id}`}</span></td>
                   <td>{statusBadge(r.status)}</td>
                   <td>
                     {isMentor && r.status === "Pending" ? (

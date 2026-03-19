@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom"
 
 const cards = [
-  { to: "/add-employee",       icon: "👤", title: "Add Employee",      desc: "Create a new employee account" },
-  { to: "/create-skill",       icon: "⭐", title: "Create Skill",       desc: "Add a skill to the program" },
-  { to: "/add-practice-head",  icon: "🎯", title: "Add Practice Head",  desc: "Assign PH to a skill" },
-  { to: "/view-practice-heads",icon: "👥", title: "Practice Heads",     desc: "View all practice heads" },
-  { to: "/view-mentors",       icon: "🏅", title: "All Mentors",        desc: "View approved mentors" },
-  { to: "/view-mentees",       icon: "📚", title: "All Mentees",        desc: "View active mentorships" },
+  { to: "/add-employee",       title: "Add Employee",      desc: "Create a new employee account" },
+  { to: "/create-skill",       title: "Create Skill",       desc: "Add a skill to the program" },
+  { to: "/add-practice-head",  title: "Add Practice Head",  desc: "Assign PH to a skill" },
+  { to: "/view-practice-heads",title: "Practice Heads",     desc: "View all practice heads" },
+  { to: "/view-mentors",       title: "All Mentors",        desc: "View approved mentors" },
+  { to: "/view-mentees",       title: "All Mentees",        desc: "View active mentorships" },
 ]
 
 export default function AdminDashboard() {

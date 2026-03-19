@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { enrollUser } from "../services/authService"
 import { getSkills } from "../services/skillService"
+import { useAuth } from "../context/AuthContext"
 
 interface Skill {
   skill_id: number
@@ -16,7 +17,9 @@ export default function Enroll() {
   const [selectedSkillId, setSelectedSkillId] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   useEffect(() => {
     if (isMentor) {
@@ -36,11 +39,11 @@ export default function Enroll() {
 
       if (isMentor) {
         alert(res.message || "Mentor application submitted! A Practice Head will review it.")
+        navigate("/")
       } else {
-        alert(res.message || "Enrolled successfully as a Mentee!")
-      }      
-      navigate("/")
-      
+        login(res.access_token, "mentee")
+        navigate("/mentee-dashboard")
+      }
     } catch (err: any) {
       setError(err?.response?.data?.detail || "Enrollment failed. Please check your credentials.")
     } finally {

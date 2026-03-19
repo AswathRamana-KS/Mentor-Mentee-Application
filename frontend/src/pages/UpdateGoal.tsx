@@ -51,8 +51,7 @@ export default function UpdateGoal() {
       setTitle(""); setDesc(""); setDeadline("")
     } catch (err: any) {
       alert(err?.response?.data?.detail || "Error creating goal")
-    } finally {
-      setCreating(false) }
+    } finally { setCreating(false) }
   }
 
   const handleAddCheckpoint = async (e: React.FormEvent) => {
@@ -65,8 +64,7 @@ export default function UpdateGoal() {
       await loadGoals()
     } catch (err: any) {
       alert(err?.response?.data?.detail || "Error adding checkpoint")
-    } finally {
-      setAddingCp(false) }
+    } finally { setAddingCp(false) }
   }
 
   const handleToggle = async (g_id: number, cp_id: number, current: boolean) => {
@@ -100,16 +98,10 @@ export default function UpdateGoal() {
       <div className="form-card" style={{ maxWidth: "580px" }}>
 
         <div style={{ display: "flex", gap: "8px", marginBottom: "24px" }}>
-          <button
-            onClick={() => setTab("create")}
-            className={`btn ${tab === "create" ? "btn-primary" : "btn-secondary"}`}
-          >
+          <button onClick={() => setTab("create")} className={`btn ${tab === "create" ? "btn-primary" : "btn-secondary"}`}>
             Create Goal
           </button>
-          <button
-            onClick={() => setTab("checkpoints")}
-            className={`btn ${tab === "checkpoints" ? "btn-primary" : "btn-secondary"}`}
-          >
+          <button onClick={() => setTab("checkpoints")} className={`btn ${tab === "checkpoints" ? "btn-primary" : "btn-secondary"}`}>
             Checkpoints
           </button>
         </div>
@@ -120,7 +112,7 @@ export default function UpdateGoal() {
             <option value="">— Select a mentee —</option>
             {mentees.map(m => (
               <option key={m.ms_id} value={m.ms_id}>
-                Mentorship #{m.ms_id} | Mentee #{m.mentee_id}
+                {m.mentee_name ?? `Mentee #${m.mentee_id}`} — {m.skill_name ?? `Skill #${m.skill_id}`}
               </option>
             ))}
           </select>
@@ -130,32 +122,15 @@ export default function UpdateGoal() {
           <form onSubmit={handleCreateGoal}>
             <div className="form-group">
               <label>Goal Title</label>
-              <input
-                placeholder="e.g. Learn Python basics"
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                required
-              />
+              <input placeholder="e.g. Learn Python basics" value={title} onChange={e => setTitle(e.target.value)} required />
             </div>
             <div className="form-group">
               <label>Description</label>
-              <textarea
-                placeholder="What should the mentee achieve?"
-                value={desc}
-                onChange={e => setDesc(e.target.value)}
-                rows={3}
-                required
-                style={{ resize: "vertical" }}
-              />
+              <textarea placeholder="What should the mentee achieve?" value={desc} onChange={e => setDesc(e.target.value)} rows={3} required style={{ resize: "vertical" }} />
             </div>
             <div className="form-group">
               <label>Deadline</label>
-              <input
-                type="date"
-                value={deadline}
-                onChange={e => setDeadline(e.target.value)}
-                required
-              />
+              <input type="date" value={deadline} onChange={e => setDeadline(e.target.value)} required />
             </div>
             <button type="submit" className="btn btn-primary" style={{ width: "100%" }} disabled={creating}>
               {creating ? "Creating..." : "Create Goal"}
@@ -187,9 +162,7 @@ export default function UpdateGoal() {
                     <div style={{ marginBottom: "20px" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
                         <span style={{ fontSize: "13px", color: "var(--text2)" }}>Progress</span>
-                        <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--teal-400)" }}>
-                          {currentGoal.percent}%
-                        </span>
+                        <span style={{ fontSize: "13px", fontWeight: 600, color: "var(--teal-400)" }}>{currentGoal.percent}%</span>
                       </div>
                       <div className="progress-wrap">
                         <div className="progress-bar" style={{ width: `${currentGoal.percent}%` }} />
@@ -203,13 +176,9 @@ export default function UpdateGoal() {
                         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                           {currentGoal.checkpoints.map((cp: any) => (
                             <div key={cp.cp_id} style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "10px",
-                              padding: "10px 12px",
-                              background: "var(--surface2)",
-                              borderRadius: "var(--radius-sm)",
-                              border: "1px solid var(--border)"
+                              display: "flex", alignItems: "center", gap: "10px",
+                              padding: "10px 12px", background: "var(--surface2)",
+                              borderRadius: "var(--radius-sm)", border: "1px solid var(--border)"
                             }}>
                               <input
                                 type="checkbox"
@@ -218,8 +187,7 @@ export default function UpdateGoal() {
                                 style={{ width: "16px", height: "16px", accentColor: "var(--teal-400)", cursor: "pointer", flexShrink: 0 }}
                               />
                               <span style={{
-                                flex: 1,
-                                fontSize: "14px",
+                                flex: 1, fontSize: "14px",
                                 color: cp.is_done ? "var(--text3)" : "var(--text)",
                                 textDecoration: cp.is_done ? "line-through" : "none"
                               }}>
@@ -227,19 +195,9 @@ export default function UpdateGoal() {
                               </span>
                               <button
                                 onClick={() => handleDeleteCp(currentGoal.g_id, cp.cp_id)}
-                                style={{
-                                  background: "none",
-                                  border: "none",
-                                  cursor: "pointer",
-                                  color: "var(--text3)",
-                                  fontSize: "16px",
-                                  padding: "0 4px",
-                                  lineHeight: 1
-                                }}
+                                style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", fontSize: "16px", padding: "0 4px", lineHeight: 1 }}
                                 title="Delete checkpoint"
-                              >
-                                ×
-                              </button>
+                              >×</button>
                             </div>
                           ))}
                         </div>
@@ -264,7 +222,6 @@ export default function UpdateGoal() {
             )}
           </div>
         )}
-
       </div>
     </div>
   )

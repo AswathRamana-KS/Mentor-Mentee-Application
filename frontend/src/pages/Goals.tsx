@@ -23,11 +23,7 @@ export default function Goals() {
 
   const handleChange = async (ms_id: number) => {
     setSelected(ms_id)
-    try {
-      setGoals(await getGoals(ms_id))
-    } catch (e) {
-      console.error(e)
-    }
+    try { setGoals(await getGoals(ms_id)) } catch (e) { console.error(e) }
   }
 
   if (loading) return <div className="page"><div className="loading">Loading...</div></div>
@@ -52,7 +48,7 @@ export default function Goals() {
                 <select value={selected ?? ""} onChange={e => handleChange(Number(e.target.value))}>
                   {mentorships.map(ms => (
                     <option key={ms.ms_id} value={ms.ms_id}>
-                      #{ms.ms_id} — Skill {ms.skill_id}
+                      {ms.mentor_name ?? `Mentor #${ms.mentor_id}`} — {ms.skill_name ?? `Skill #${ms.skill_id}`}
                     </option>
                   ))}
                 </select>
@@ -98,12 +94,8 @@ export default function Goals() {
                         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                           {g.checkpoints.map((cp: any) => (
                             <div key={cp.cp_id} style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "10px",
-                              padding: "8px 10px",
-                              background: "var(--surface2)",
-                              borderRadius: "var(--radius-sm)"
+                              display: "flex", alignItems: "center", gap: "10px",
+                              padding: "8px 10px", background: "var(--surface2)", borderRadius: "var(--radius-sm)"
                             }}>
                               <div style={{
                                 width: "16px", height: "16px", borderRadius: "4px", flexShrink: 0,

@@ -1,10 +1,9 @@
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { getMyProfile } from "../services/employeeService"
 import { getMyMentorships, getMentorshipRequests } from "../services/mentorService"
 
 export default function MenteeDashboard() {
-  const navigate = useNavigate()
   const [user, setUser] = useState<any>(null)
   const [mentorships, setMentorships] = useState<any[]>([])
   const [pending, setPending] = useState<any[]>([])
@@ -66,8 +65,7 @@ export default function MenteeDashboard() {
             <table>
               <thead>
                 <tr>
-                  <th>Mentorship ID</th>
-                  <th>Mentor ID</th>
+                  <th>Mentor</th>
                   <th>Skill</th>
                   <th></th>
                 </tr>
@@ -75,10 +73,13 @@ export default function MenteeDashboard() {
               <tbody>
                 {mentorships.map(ms => (
                   <tr key={ms.ms_id}>
-                    <td style={{ color: "var(--text3)" }}>#{ms.ms_id}</td>
-                    <td style={{ fontWeight: 500 }}>#{ms.mentor_id}</td>
-                    <td><span className="badge badge-green">Skill #{ms.skill_id}</span></td>
-                    <td><Link to="/goals" style={{ color: "var(--teal-400)", fontSize: "13px", textDecoration: "none" }}>View Goals →</Link></td>
+                    <td style={{ fontWeight: 500 }}>{ms.mentor_name ?? `#${ms.mentor_id}`}</td>
+                    <td><span className="badge badge-green">{ms.skill_name ?? `Skill #${ms.skill_id}`}</span></td>
+                    <td>
+                      <Link to="/goals" style={{ color: "var(--teal-400)", fontSize: "13px", textDecoration: "none" }}>
+                        View Goals →
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -88,4 +89,4 @@ export default function MenteeDashboard() {
       )}
     </div>
   )
-} 
+}

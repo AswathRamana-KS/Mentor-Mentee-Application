@@ -1,4 +1,5 @@
 import { Navigate } from "react-router-dom"
+import { useAuth } from "../context/AuthContext"
 
 interface Props {
   children: React.ReactNode
@@ -6,17 +7,16 @@ interface Props {
 }
 
 export default function ProtectedRoute({ children, roles }: Props) {
-  const token = localStorage.getItem("token")
-  const role = localStorage.getItem("role")
+  const { auth } = useAuth()
 
-  if (!token) {
+  if (!auth.token) {
     return <Navigate to="/" />
   }
 
-  if (roles && role && !roles.includes(role)) {
-    if (role === "admin") return <Navigate to="/admin-dashboard" />
-    if (role === "practicehead") return <Navigate to="/approve-mentors" />
-    if (role === "mentor") return <Navigate to="/mentor-dashboard" />
+  if (roles && auth.role && !roles.includes(auth.role)) {
+    if (auth.role === "admin") return <Navigate to="/admin-dashboard" />
+    if (auth.role === "practicehead") return <Navigate to="/approve-mentors" />
+    if (auth.role === "mentor") return <Navigate to="/mentor-dashboard" />
     return <Navigate to="/mentee-dashboard" />
   }
 

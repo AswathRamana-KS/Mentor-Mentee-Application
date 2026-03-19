@@ -1,16 +1,10 @@
-import { Link, useNavigate, useLocation } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
+import { useAuth } from "../context/AuthContext"
 
 export default function Navbar() {
-  const role = localStorage.getItem("role")
-  const navigate = useNavigate()
+  const { auth, logout } = useAuth()
+  const role = auth.role
   const location = useLocation()
-
-  const handleLogout = () => {
-    localStorage.removeItem("token")
-    localStorage.removeItem("role")
-    localStorage.removeItem("emp_id")
-    navigate("/")
-  }
 
   return (
     <nav className="navbar">
@@ -49,7 +43,7 @@ export default function Navbar() {
         )}
       </div>
 
-      <button onClick={handleLogout} className="btn btn-secondary btn-sm">
+      <button onClick={logout} className="btn btn-secondary btn-sm">
         Logout
       </button>
     </nav>

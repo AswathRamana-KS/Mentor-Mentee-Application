@@ -90,6 +90,9 @@ class MentorShipRequestResponse(BaseModel):
     mentee_id: int
     skill_id: int
     status: str
+    mentor_name: Optional[str] = None
+    mentee_name: Optional[str] = None
+    skill_name: Optional[str] = None
     model_config = {"from_attributes": True}
 
 class MentorShipAccept(BaseModel):
@@ -110,6 +113,9 @@ class MenteeResponse(BaseModel):
     mentor_id: int
     mentee_id: int
     skill_id: int
+    mentor_name: Optional[str] = None
+    mentee_name: Optional[str] = None
+    skill_name: Optional[str] = None
     model_config = {"from_attributes": True}
 
 

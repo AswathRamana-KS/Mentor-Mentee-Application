@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import { loginInit, loginComplete } from "../services/authService"
+import { useAuth } from "../context/AuthContext"
 
 export default function Login() {
   const [email, setEmail] = useState("")
@@ -12,6 +13,7 @@ export default function Login() {
   const [selectedRole, setSelectedRole] = useState<"Mentor" | "Mentee">("Mentee")
 
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   const goToDashboard = (role: string) => {
     const r = role.toLowerCase()
@@ -32,8 +34,7 @@ export default function Login() {
       if (!res.requires_role_selection) {
         const role = res.roles[0]
         const tokenRes = await loginComplete(email, role)
-        localStorage.setItem("token", tokenRes.access_token)
-        localStorage.setItem("role", role.toLowerCase())
+        login(tokenRes.access_token, role.toLowerCase())
         goToDashboard(role)
       } else {
         setNeedsRoleSelect(true)
@@ -49,8 +50,7 @@ export default function Login() {
     setLoading(true)
     try {
       const tokenRes = await loginComplete(email, selectedRole)
-      localStorage.setItem("token", tokenRes.access_token)
-      localStorage.setItem("role", selectedRole.toLowerCase())
+      login(tokenRes.access_token, selectedRole.toLowerCase())
       goToDashboard(selectedRole)
     } catch {
       setError("Something went wrong. Please try again.")
@@ -126,8 +126,7 @@ export default function Login() {
         )}
 
         <p className="auth-footer">
-          Not enrolled yet?{" "}
-          <Link to="/enroll">Enroll here</Link>
+          Not enrolled yet? <Link to="/enroll">Enroll here</Link>
         </p>
       </div>
     </div>

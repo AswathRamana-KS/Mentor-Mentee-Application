@@ -74,6 +74,10 @@ class MentorshipRequest(Base):
     skill_id = Column(Integer, ForeignKey("skills.skill_id"))
     status = Column(String(50), nullable=False, default="Pending")
 
+    mentor = relationship("Employee", foreign_keys=[mentor_id])
+    mentee = relationship("Employee", foreign_keys=[mentee_id])
+    skill = relationship("Skills", foreign_keys=[skill_id])
+
 class Mentorship(Base):
     __tablename__ = "mentorship"
 
@@ -81,6 +85,10 @@ class Mentorship(Base):
     mentor_id = Column(Integer, ForeignKey("employees.emp_id"))
     mentee_id = Column(Integer, ForeignKey("employees.emp_id"))
     skill_id = Column(Integer, ForeignKey("skills.skill_id"))
+
+    mentor = relationship("Employee", foreign_keys=[mentor_id])
+    mentee = relationship("Employee", foreign_keys=[mentee_id])
+    skill = relationship("Skills", foreign_keys=[skill_id])
 
 class Goal(Base):
     __tablename__ = "goal"

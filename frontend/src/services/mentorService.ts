@@ -66,3 +66,7 @@ export const getMyMentorships = async () => {
   const response = await API.get("/mentor/mymentorship")
   return response.data
 }
+export const getPhSkills = async () => {
+  const response = await API.get("/mentor/ph/myskills")
+  return response.data
+}

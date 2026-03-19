@@ -57,12 +57,12 @@ export default function MentorDashboard() {
       <div className="table-card" style={{ marginBottom: "28px" }}>
         {requests.length === 0 ? <div className="empty">No pending requests.</div> : (
           <table>
-            <thead><tr><th>Mentee ID</th><th>Skill ID</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Mentee</th><th>Skill</th><th>Actions</th></tr></thead>
             <tbody>
               {requests.map(r => (
                 <tr key={r.mr_id}>
-                  <td style={{ fontWeight: 500 }}>#{r.mentee_id}</td>
-                  <td><span className="badge badge-green">Skill #{r.skill_id}</span></td>
+                  <td style={{ fontWeight: 500 }}>{r.mentee_name ?? `#${r.mentee_id}`}</td>
+                  <td><span className="badge badge-green">{r.skill_name ?? `Skill #${r.skill_id}`}</span></td>
                   <td>
                     <div style={{ display: "flex", gap: "8px" }}>
                       <button onClick={() => accept(r.mr_id)} className="btn btn-success btn-sm">Accept</button>
@@ -81,13 +81,12 @@ export default function MentorDashboard() {
           <h2 className="section-title">My Mentees</h2>
           <div className="table-card">
             <table>
-              <thead><tr><th>Mentorship ID</th><th>Mentee ID</th><th>Skill</th><th>Goals</th></tr></thead>
+              <thead><tr><th>Mentee</th><th>Skill</th><th>Goals</th></tr></thead>
               <tbody>
                 {mentees.map(m => (
                   <tr key={m.ms_id}>
-                    <td style={{ color: "var(--text3)" }}>#{m.ms_id}</td>
-                    <td style={{ fontWeight: 500 }}>#{m.mentee_id}</td>
-                    <td><span className="badge badge-green">Skill #{m.skill_id}</span></td>
+                    <td style={{ fontWeight: 500 }}>{m.mentee_name ?? `#${m.mentee_id}`}</td>
+                    <td><span className="badge badge-green">{m.skill_name ?? `Skill #${m.skill_id}`}</span></td>
                     <td>
                       <Link to={`/update-goal?ms_id=${m.ms_id}`}
                         style={{ color: "var(--teal-400)", fontSize: "13px", textDecoration: "none" }}>
