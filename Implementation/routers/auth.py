@@ -5,6 +5,7 @@ import models
 import schemas
 from auth import verify_password, create_access_token
 from fastapi.security import OAuth2PasswordRequestForm
+from datetime import datetime
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -13,7 +14,6 @@ def login_init(
     credentials: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-    print(credentials.username,credentials.password)
     employee = db.query(models.Employee).filter(
         models.Employee.email_id == credentials.username
     ).first()
@@ -95,7 +95,7 @@ def login_complete(
         "token_type": "bearer"
     }
 
-@router.post("/enroll-auth")
+@router.post("/enroll")
 def enroll_auth(
     role : bool,
     skill_id : int,
@@ -106,11 +106,19 @@ def enroll_auth(
         models.Employee.email_id == credentials.username
     ).first()
 
+
     if not employee or not verify_password(credentials.password, employee.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
         )
+    
+    if employee.years_of_exp < 8 and role:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Need 7+ Years of experience"
+        )
+
     if role:
         existing = db.query(models.MentorApplication).filter(
             models.MentorApplication.emp_id == employee.emp_id,
@@ -134,6 +142,8 @@ def enroll_auth(
         db.add(new_mentor_app)
         db.commit()
         db.refresh(new_mentor_app)
+
+        return {"message": "Mentor application submitted successfully"}
     else :
         existing = db.query(models.Mentee).filter(
             models.Mentee.emp_id == employee.emp_id
@@ -151,5 +161,7 @@ def enroll_auth(
         db.add(new_mentee)
         db.commit()
         db.refresh(new_mentee)
+
+        return {"message": "Mentee enrolled successfully"}
 
 

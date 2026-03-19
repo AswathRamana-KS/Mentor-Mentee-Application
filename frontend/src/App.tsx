@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
-import Navbar from "./components/Navbar"
+import Navbar from "./layout/Navbar"
 import Login from "./pages/Login"
 import Enroll from "./pages/Enroll"
 import MenteeDashboard from "./pages/MenteeDashboard"
@@ -29,11 +29,9 @@ function Layout() {
     <>
       {!hideNavbar && <Navbar />}
       <Routes>
-        {/* Public routes */}
         <Route path="/" element={<Login />} />
         <Route path="/enroll" element={<Enroll />} />
 
-        {/* Admin routes */}
         <Route path="/admin-dashboard" element={<ProtectedRoute roles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
         <Route path="/add-employee" element={<ProtectedRoute roles={["admin"]}><AddEmployee /></ProtectedRoute>} />
         <Route path="/add-practice-head" element={<ProtectedRoute roles={["admin"]}><AddPracticeHead /></ProtectedRoute>} />
@@ -42,15 +40,12 @@ function Layout() {
         <Route path="/view-mentors" element={<ProtectedRoute roles={["admin"]}><ViewMentors /></ProtectedRoute>} />
         <Route path="/view-mentees" element={<ProtectedRoute roles={["admin"]}><ViewMentees /></ProtectedRoute>} />
 
-        {/* Practice head routes */}
         <Route path="/approve-mentors" element={<ProtectedRoute roles={["practicehead"]}><ApproveMentors /></ProtectedRoute>} />
         <Route path="/mentors-by-skill" element={<ProtectedRoute roles={["practicehead"]}><ViewMentorsBySkill /></ProtectedRoute>} />
 
-        {/* Mentor routes */}
         <Route path="/mentor-dashboard" element={<ProtectedRoute roles={["mentor"]}><MentorDashboard /></ProtectedRoute>} />
         <Route path="/update-goal" element={<ProtectedRoute roles={["mentor"]}><UpdateGoal /></ProtectedRoute>} />
 
-        {/* Mentee routes */}
         <Route path="/mentee-dashboard" element={<ProtectedRoute roles={["mentee"]}><MenteeDashboard /></ProtectedRoute>} />
         <Route path="/browse-mentors" element={<ProtectedRoute roles={["mentee"]}><BrowseMentors /></ProtectedRoute>} />
         <Route path="/mentor-requests" element={<ProtectedRoute roles={["mentee"]}><MentorRequests /></ProtectedRoute>} />

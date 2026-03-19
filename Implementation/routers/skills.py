@@ -45,7 +45,6 @@ def create_skills(
     summary="Get All Available Skills"
 )
 def get_all_skill(
-    user: models.Employee = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     skills = db.query(models.Skills).all()

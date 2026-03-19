@@ -4,6 +4,9 @@ import { getMentorshipRequests, acceptMenteeRequest, rejectMenteeRequest } from 
 export default function MentorRequests() {
   const [requests, setRequests] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  
+  const userRole = localStorage.getItem("role")?.toLowerCase() || "mentee"
+  const isMentor = userRole === "mentor"
 
   useEffect(() => { load() }, [])
 
@@ -35,24 +38,39 @@ export default function MentorRequests() {
         <h1 className="page-title">Mentorship Requests</h1>
         <p className="page-sub">{requests.length} total request(s)</p>
       </div>
+      
       <div className="table-card">
         {loading ? <div className="loading">Loading...</div> :
          requests.length === 0 ? <div className="empty">No requests yet.</div> : (
           <table>
-            <thead><tr><th>Request ID</th><th>Mentee ID</th><th>Skill ID</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead>
+              <tr>
+                <th>Request ID</th>
+                <th>{isMentor ? "Mentee ID" : "Mentor ID"}</th>
+                <th>Skill ID</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
             <tbody>
               {requests.map(r => (
                 <tr key={r.mr_id}>
                   <td style={{ color: "var(--text3)" }}>#{r.mr_id}</td>
-                  <td style={{ fontWeight: 500 }}>#{r.mentee_id}</td>
+                  
+                  <td style={{ fontWeight: 500 }}>
+                    #{isMentor ? r.mentee_id : r.mentor_id}
+                  </td>
+                  
                   <td><span className="badge badge-blue">Skill #{r.skill_id}</span></td>
                   <td>{statusBadge(r.status)}</td>
                   <td>
-                    {r.status === "Pending" && (
+                    {isMentor && r.status === "Pending" ? (
                       <div style={{ display: "flex", gap: "8px" }}>
                         <button onClick={() => accept(r.mr_id)} className="btn btn-success btn-sm">Accept</button>
                         <button onClick={() => reject(r.mr_id)} className="btn btn-danger btn-sm">Reject</button>
                       </div>
+                    ) : (
+                      <span style={{ color: "var(--text3)" }}>—</span>
                     )}
                   </td>
                 </tr>

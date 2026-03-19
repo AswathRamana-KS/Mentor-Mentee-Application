@@ -26,16 +26,19 @@ def request_mentorship(
     existing = db.query(models.MentorshipRequest).filter(
         models.MentorshipRequest.mentor_id == mentor_data.mentor_id,
         models.MentorshipRequest.mentee_id == mentee.emp_id,
-        models.MentorshipRequest.skill_id == mentor_data.skill_id,
-        models.MentorshipRequest.status == "Pending"
+        models.MentorshipRequest.skill_id == mentor_data.skill_id
     ).first()
     if existing:
-        raise HTTPException(status_code=400, detail="You already have a pending request with this mentor")
+        if existing.status == "Pending":
+            raise HTTPException(status_code=400, detail="You already have a pending request with this mentor")
+        elif existing.status == "Accepted":
+            raise HTTPException(status_code=400, detail="You are already under his mentorship for this skill")
+
 
     new_req = models.MentorshipRequest(
         mentor_id=mentor_data.mentor_id,
         mentee_id=mentee.emp_id,
-        skill_id=mentor_data.skill_id,
+        skill_id=mentor_data.skill_id,  
         status="Pending"
     )
     db.add(new_req)

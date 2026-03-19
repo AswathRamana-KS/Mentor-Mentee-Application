@@ -36,12 +36,11 @@ export default function Enroll() {
 
       if (isMentor) {
         alert(res.message || "Mentor application submitted! A Practice Head will review it.")
-        navigate("/")
       } else {
-        localStorage.setItem("token", res.access_token)
-        localStorage.setItem("role", "mentee")
-        navigate("/mentee-dashboard")
-      }
+        alert(res.message || "Enrolled successfully as a Mentee!")
+      }      
+      navigate("/")
+      
     } catch (err: any) {
       setError(err?.response?.data?.detail || "Enrollment failed. Please check your credentials.")
     } finally {
