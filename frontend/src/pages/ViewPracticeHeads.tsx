@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react"
 import { getAllPracticeHeads } from "../services/practiceHeadService"
 
-function initials(name: string) {
-  return name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "?"
-}
-
 export default function ViewPracticeHeads() {
   const [phs, setPhs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -29,7 +25,6 @@ export default function ViewPracticeHeads() {
                 <tr key={ph.ph_id}>
                   <td>
                     <div className="name-cell">
-                      <div className="avatar">{initials(ph.employee?.name)}</div>
                       {ph.employee?.name}
                     </div>
                   </td>

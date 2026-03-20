@@ -37,21 +37,18 @@ export default function MenteeDashboard() {
 
       <div className="dashboard-grid" style={{ marginBottom: "28px" }}>
         <Link to="/browse-mentors" className="dashboard-card">
-          <div className="card-icon"></div>
           <div className="card-title">Browse Mentors</div>
           <div className="card-desc">Find a mentor by skill</div>
           <div className="card-arrow">Go →</div>
         </Link>
         {mentorships.length > 0 && (
           <Link to="/goals" className="dashboard-card">
-            <div className="card-icon"></div>
             <div className="card-title">My Goals</div>
             <div className="card-desc">{mentorships.length} active mentorship(s)</div>
             <div className="card-arrow">View →</div>
           </Link>
         )}
         <Link to="/mentor-requests" className="dashboard-card">
-          <div className="card-icon"></div>
           <div className="card-title">My Requests</div>
           <div className="card-desc">{pending.length} pending request(s)</div>
           <div className="card-arrow">View →</div>

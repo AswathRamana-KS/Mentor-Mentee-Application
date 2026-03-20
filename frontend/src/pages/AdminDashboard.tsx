@@ -19,7 +19,6 @@ export default function AdminDashboard() {
       <div className="dashboard-grid">
         {cards.map(c => (
           <Link key={c.to} to={c.to} className="dashboard-card">
-            <div className="card-icon">{c.icon}</div>
             <div className="card-title">{c.title}</div>
             <div className="card-desc">{c.desc}</div>
             <div className="card-arrow">Go →</div>

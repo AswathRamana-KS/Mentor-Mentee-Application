@@ -2,10 +2,6 @@ import { useEffect, useState } from "react"
 import { getAllMentees, getAllEmployees } from "../services/employeeService"
 import { getSkills } from "../services/skillService"
 
-function initials(name: string) {
-  return name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "?"
-}
-
 export default function ViewMentees() {
   const [mentees, setMentees] = useState<any[]>([])
   const [empMap, setEmpMap] = useState<Map<number, any>>(new Map())
@@ -39,16 +35,12 @@ export default function ViewMentees() {
                   <tr key={m.ms_id}>
                     <td>
                       <div className="name-cell">
-                        <div className="avatar">{initials(mentee?.name)}</div>
-                        <div>
-                          <div style={{ fontWeight: 500 }}>{mentee?.name ?? `#${m.mentee_id}`}</div>
-                          <div style={{ fontSize: "12px", color: "var(--text3)" }}>{mentee?.email_id}</div>
-                        </div>
+                        <div style={{ fontWeight: 500 }}>{mentee?.name ?? `#${m.mentee_id}`}</div>
+                        <div style={{ fontSize: "12px", color: "var(--text3)" }}>{mentee?.email_id}</div>                        
                       </div>
                     </td>
                     <td>
                       <div className="name-cell">
-                        <div className="avatar">{initials(mentor?.name)}</div>
                         {mentor?.name ?? `#${m.mentor_id}`}
                       </div>
                     </td>

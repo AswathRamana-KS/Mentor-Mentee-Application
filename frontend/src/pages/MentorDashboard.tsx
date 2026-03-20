@@ -38,7 +38,6 @@ export default function MentorDashboard() {
 
       <div className="dashboard-grid" style={{ marginBottom: "28px" }}>
         <Link to="/update-goal" className="dashboard-card">
-          <div className="card-icon"></div>
           <div className="card-title">Set Goals</div>
           <div className="card-desc">Create and assign goals to your mentees</div>
           <div className="card-arrow">Go →</div>

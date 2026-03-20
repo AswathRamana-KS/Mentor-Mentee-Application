@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react"
 import { getAllMentors } from "../services/employeeService"
 
-function initials(name: string) {
-  return name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "?"
-}
-
 export default function ViewMentors() {
   const [mentors, setMentors] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -29,11 +25,8 @@ export default function ViewMentors() {
                 <tr key={m.emp_id}>
                   <td>
                     <div className="name-cell">
-                      <div className="avatar">{initials(m.name)}</div>
-                      <div>
-                        <div style={{ fontWeight: 500 }}>{m.name}</div>
-                        <div style={{ fontSize: "12px", color: "var(--text3)" }}>{m.email_id}</div>
-                      </div>
+                      <div style={{ fontWeight: 500 }}>{m.name}</div>
+                      <div style={{ fontSize: "12px", color: "var(--text3)" }}>{m.email_id}</div>
                     </div>
                   </td>
                   <td><span className="badge badge-blue">{m.division || "—"}</span></td>

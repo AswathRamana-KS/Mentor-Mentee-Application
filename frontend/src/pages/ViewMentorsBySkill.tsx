@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react"
 import { getPhSkills, getMentorsBySkill } from "../services/mentorService"
 
-function initials(name: string) {
-  return name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) || "?"
-}
-
 export default function ViewMentorsBySkill() {
   const [skills, setSkills] = useState<any[]>([])
   const [selected, setSelected] = useState("")
@@ -52,11 +48,8 @@ export default function ViewMentorsBySkill() {
                 <tr key={m.mentor.emp_id}>
                   <td>
                     <div className="name-cell">
-                      <div className="avatar">{initials(m.mentor.name)}</div>
-                      <div>
-                        <div style={{ fontWeight: 500 }}>{m.mentor.name}</div>
-                        <div style={{ fontSize: "12px", color: "var(--text3)" }}>{m.mentor.email_id}</div>
-                      </div>
+                      <div style={{ fontWeight: 500 }}>{m.mentor.name}</div>
+                      <div style={{ fontSize: "12px", color: "var(--text3)" }}>{m.mentor.email_id}</div>                      
                     </div>
                   </td>
                   <td><span className="badge badge-blue">{m.mentor.division || "—"}</span></td>
